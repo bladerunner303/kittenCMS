@@ -1,0 +1,234 @@
+  <table style="background-color: white">
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshNews('<%-siteId%>');"
+        title="Hírek frissitése"
+        style="width: 24px; height: 24px;cursor:pointer;"/>
+      </td>
+      <td>
+        <img src="images/add.png" onclick="addNews('<%-siteId%>');"
+        title="Hír létrehozása"
+        style="width: 24; height: 24px;cursor:pointer;"
+        id="img-add"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table style="background-color: white; border: 0px; font-size: 12px; width: 100%">
+      <tbody>
+    <% for(var row in rows) { %>
+    <tr>
+      <td style="width:30%;padding:5px;">
+        <span>Cím:&nbsp;</span>
+        <input type="text" id="tb-news-title-<%=rows[row].id%>"
+        value="<%=rows[row].title%>"
+        onchange="saveNews('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , 'title');"></input>&nbsp;
+      </td>
+      <td style="padding:5px;">
+        <span>Látható</span>
+        <input type="checkbox" id="cb-news-visible-<%=rows[row].id%>"
+        onchange="saveNews('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , 'visible');"
+        <% if (rows[row].visible== '1') { %>
+        checked
+        <% } %>
+        />
+      </td>
+      <td style="padding:5px;">
+        <span>Kiemelt</span>
+        <input type="checkbox" id="cb-news-highlight-<%=rows[row].id%>"
+        onchange="saveNews('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , 'highlight');"
+        <% if (rows[row].highlight== '1') { %>
+        checked
+        <% } %>
+        />
+      </td>
+      <td>
+        <span style="padding:5px;">Létrehozva</span>
+        <span><%=rows[row].created%> (<%-rows[row].creator%>)&nbsp;</span>
+      </td>
+      <td style="padding:5px;">
+        <span>Módositva</span>
+        <span id="sp-news-mod-<%-rows[row].id%>"><%-rows[row].modified%> (<%-rows[row].modifier%>)&nbsp;</span>
+      </td>
+      <td style="vertical-align: right; padding:5px;">
+        <button id="btn-news-content-mod" onclick="showNewsEditor('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , '<%=rows[row].content%>');">
+          Tartalom
+        </button>
+      </td>
+    </tr>
+    <% } %>
+    </tbody>
+  </table>
+
+  <script type="text/javascript">
+
+    function addNews(siteId){
+      showNewsEditor(siteId, null);
+    }
+
+    function showNewsEditor(siteId, newsId, content){
+      $.get("../templates/newsEditor.html?x=" + Util.getCurrentDate()).then(function(text, status, xhr){
+        var title = "Hír hozzáadása";
+        if (!newsId == null){
+          title = "Hír módosítása";
+        }
+        var html = text;
+        var width = '1020px';
+        var buttons = {
+          'OK': {
+            click: function (){
+              saveNews(siteId, newsId, 'content');
+            },
+            id: 'bt-news-save',
+            text: 'Mentés'
+          }
+        };
+        Util.showSimpleDialog(title, html, width, buttons);
+        if (newsId == null){
+          $('.only-new-row').show();
+        }
+        else{
+          $('#tb-news-content').val(content);
+        }
+        setNewsEditor();
+
+      });
+    }
+
+    function setNewsEditor(){
+      newsEditor = SUNEDITOR.create((document.getElementById('tb-news-content') || 'tb-content-' + data[i].id), {
+     font : [
+             'Arial',
+             'tohoma',
+             'Courier New,Courier'
+         ],
+      fontSize : [
+             8, 10, 12, 14, 18, 24, 36
+         ],
+         colorList : [
+             ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+             ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+         ],
+         paragraphStyles : [
+             'spaced',
+             'neon'
+         ],
+         textStyles : [
+             'translucent'
+         ],
+         width : '100%',
+         maxWidth : '1600px',
+         minWidth : '400px',
+         height : '200px',
+         maxHeight: '200px',
+         videoWidth : '80%',
+         youtubeQuery : 'autoplay=1&mute=1&enablejsapi=1',
+     buttonList : [
+           ['undo', 'redo', 'font', 'fontSize', 'formatBlock'],
+           ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'],
+           ['fontColor', 'hiliteColor', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'table'],
+           ['link', 'image', 'video', 'showBlocks', 'codeView', 'save']
+       ]
+     });
+    }
+
+    function saveNews(siteId, newsId, changeField){
+      var data = {};
+      if (newsId == null){
+        data.title = $('#tb-news-title').val().trim();
+        data.visible = 0;
+        if (document.getElementById('cb-news-visible').checked){
+          data.visible = 1;
+        }
+        data.highlight = 0;
+        if (document.getElementById('cb-news-highlight').checked){
+          data.highlight = 1;
+        }
+        data.content = newsEditor.getContents();
+      }
+      else {
+        data.title =  null;
+        data.visible = null;
+        data.highlight = null;
+        data.content = null;
+        switch (changeField) {
+          case 'title':
+            data.title = $('#tb-news-title-' + newsId).val().trim();
+            break;
+          case 'visible':
+            data.visible = 0;
+            if (document.getElementById('cb-news-visible-' +newsId).checked){
+              data.visible = 1;
+            }
+            break;
+          case 'highlight':
+            data.highlight = 0;
+            if (document.getElementById('cb-news-highlight-' + newsId).checked){
+              data.highlight = 1;
+            }
+            break;
+          case 'content':
+            data.content = newsEditor.getContents();
+            break;
+          default:
+          //do nothing
+        }
+      }
+
+      data.id = newsId;
+      data.siteId = siteId;
+
+      $.ajax({
+          url: "../rest/saveNews.php",
+          type: 'POST',
+          data: JSON.stringify(data),
+          success: function(data){
+              if ((newsId == null ) || (changeField == 'content')){
+                $('#my-simple-dialog').dialog('close');
+                $('#my-simple-dialog').remove();
+                refreshNews(siteId);
+                if (newsId == null){
+                  Util.showNotificationBar('Sikeres hír létrehozás');
+                }
+                else {
+                  Util.showNotificationBar('Sikeres tartalom mentés');
+                }
+              }
+              else {
+                $('#sp-news-mod-' + newsId).text(data);
+              }
+
+          },
+          error: function(response) {
+             Util.handleErrorResponse(response);
+          }
+         });
+
+    }
+
+    function saveSetting(settingKey){
+
+      var settingValue = $("#tb-" + settingKey ).val().trim();
+      if (Util.isNullOrEmpty(settingKey)){
+        Util.showErrorNotificationBar("Beállítás megadása nélkül nem tudjuk menteni");
+      }
+
+      var data = JSON.stringify({
+        'settingKey': settingKey
+       ,'settingValue': settingValue
+   });
+
+   $.ajax({
+       url: "../rest/saveSetting.php",
+       type: 'POST',
+       data: data,
+       success: function(data){
+             refreshSettings();
+       },
+       error: function(response) {
+          Util.handleErrorResponse(response);
+       }
+      });
+    }
+
+  </script>

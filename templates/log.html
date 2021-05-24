@@ -1,0 +1,62 @@
+<div style="margin: auto;padding: 10px;">
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshLog();" title="Log állomány újra olvasása" style="width: 32px; height: 32px;cursor:pointer;"/>
+        <img src="images/clear.png"
+        id="icon-clear-log"
+        onclick="Util.confirm('Megerősítés', 'A művelet nem visszavonható! Biztos töröljük véglegesen a log állományt?', clearLog);"
+        title="Log állomány törlése" style="display:none; width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="text-align:right;font-size: 10px;">Utolsó frissités: <span id="sp-last-refresh"/>&nbsp;</td>
+    </tr>
+  </table>
+  <textarea id="log-data" style="width:100%;height:300px"></textarea>
+
+  <script type="text/javascript">
+
+    refreshLog();
+    function refreshLog(){
+
+      var getLogUrl = new URL(baseUrl + '/rest/getLog.php');
+      getLogUrl.searchParams.set('x', Date.now());
+
+      $.ajax({
+            url: getLogUrl.href,
+            type: 'GET',
+            success: function(data){
+              $('#sp-last-refresh').text(Util.getCurrentDateTime());
+              $('#log-data').val(data.log);
+              if (data.userRole == 'ADMIN'){
+                $('#icon-clear-log').show();
+              }
+              else {
+                $('#icon-clear-log').hide();
+              }
+            },
+            error:function(response) {
+              $('#log-data').val('');
+              Util.handleErrorResponse(response);
+            }
+        });
+    }
+
+    function clearLog(){
+
+      $.ajax({
+          url: "../rest/clearLogFile.php",
+          type: 'POST',
+          data: {},
+          success: function(data){
+                refreshLog();
+                Util.showNotificationBar('Sikeres log törlés!', 2000, 'grey', 'white');
+          },
+          error: function(response) {
+            Util.handleErrorResponse(response);
+          }
+      });
+    }
+
+  </script>
+
+</div>

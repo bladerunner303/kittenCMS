@@ -1,0 +1,349 @@
+<div style="margin: auto;padding: 10px;">
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshMenu();"
+        title="Felhasználók frissitése"
+        style="width: 32px; height: 32px;cursor:pointer;"
+        id="img-refresh"/>
+      </td>
+      <td>
+        <img src="images/add.png" onclick="addMenu();"
+        title="Felhasználók létrehozása"
+        style="width: 32px; height: 32px;cursor:pointer;"
+        id="img-add"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+
+  <div id="div-add-new" style="display:none">
+    <fieldset>
+        <legend>Menu létrehozás</legend>
+        <span>Menu neve:</span>
+         <input type="text" id="tb-add-new-menu"></input>
+        <button onclick="sendNew()">Létrehoz</button>
+        <button onclick="cancelNew()">Mégse</button>
+    </fieldset>
+
+  </div>
+
+  <div id="div-menu-list">
+  <% for(var row in rows) { %>
+
+  <div style="background-color: lightgray; border-radius: 5px;padding: 10px;margin: 10px;font-size:10pt">
+    <input type="hidden" value="0" id="hd-expand-<%=rows[row].id%>" />
+    <table style="width: 100%" id="table-<%=rows[row].id%>" >
+      <tr>
+        <td style="width:55px">Név:</td>
+        <td colspan="2">
+          <input type="text" style="width:98%"
+          value="<%-rows[row].name%>"
+          onchange="change('<%=rows[row].id%>', 'name');"
+          maxlength="50"
+          id="tb-name-<%=rows[row].id%>"
+          />
+        </td>
+        <td style="width:30px">
+          <img src="images/arrow_down.png"
+          onclick="showDetail('<%=rows[row].id%>');"
+          id="img-action-<%=rows[row].id%>"
+          style="width: 24px; height: 24px;cursor:pointer;" />
+        </td>
+      </tr>
+
+      <tr>
+        <td>Típus:</td>
+        <td style="bottom:0">
+          <select id="cb-menu-type-<%=rows[row].id%>"
+          onchange="change('<%=rows[row].id%>', 'menu_type');"
+          style="width: 200px;">
+              <% for(var type in types) { %>
+                      <option value="<%-types[type].key%>"
+                      <% if (types[type].key == rows[row].menu_type) { print('selected="selected"');} %> >
+                      <%-types[type].name%>
+                      </option>
+                    <% } %>
+          </select>
+          &nbsp;
+          <label for="lb-visible-<%=rows[row].id%>"> Látható</label>
+          <input
+          type="checkbox"
+          id="cb-visible-<%=rows[row].id%>"
+          onchange="change('<%=rows[row].id%>', 'visible');"
+          <% if (1 == rows[row].visible) { print('checked');} %> >
+
+          &nbsp;<span>Sorrend</span>&nbsp;
+
+          <input
+          type="number"
+          id="tb-order-field-<%=rows[row].id%>"
+          value="<%-rows[row].order_field%>"
+          onchange="change('<%=rows[row].id%>', 'order_field');"
+          style="width:60px"
+          >
+
+          &nbsp;
+          <label for="lb-default-page-<%=rows[row].id%>">Alapértelmezett</label>
+          <input
+          type="checkbox"
+          id="cb-default-page-<%=rows[row].id%>"
+          onchange="change('<%=rows[row].id%>', 'default_page');"
+          <% if (1 == rows[row].default_page) { print('checked');} %> >
+
+          <button onclick="showSample('<%=rows[row].id%>');">Előnézet</button>
+        </td>
+        <td></td>
+        <td>
+          <img src="images/trash.png"
+          onclick="Util.confirm('Megerősítés','Az oldal végleges törlésre kerül! Biztos folytatjuk?', deleteSite, '<%=rows[row].id%>');"
+          id="img-delete-<%=rows[row].id%>"
+          style="width: 24px; height: 24px;cursor:pointer;"
+          title="Az adott oldal végleges törlése" />
+        </td>
+
+      </tr>
+
+      <tr id="tr-title-<%=rows[row].id%>" style="display:none;">
+        <td>Tooltip:</td>
+        <td colspan="2">
+          <input
+          type="text"
+          id="tb-tooltip-<%=rows[row].id%>"
+          maxlength="50"
+          value="<%=rows[row].tooltip%>"
+          style="width:98%"
+          onchange="change('<%=rows[row].id%>', 'tooltip');"
+          >
+          </input>
+        </td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr id="tr-content-title-<%=rows[row].id%>" style="display:none;">
+        <td>Tartalom</td>
+        <td colspan="4">&nbsp;
+          <button onclick="change('<%=rows[row].id%>', 'content');">Html mentése</button>
+
+        </td>
+      </tr>
+
+      <tr id="tr-content-<%=rows[row].id%>" style="display:none;">
+        <td colspan="5">
+          <textarea
+          id="tb-content-<%=rows[row].id%>"
+          style="height:400px;width:100%">
+          <%=rows[row].content%>
+          </textarea>
+        </td>
+      </tr>
+
+      <tr id="tr-content-news-<%=rows[row].id%>" style="display:none;">
+        <td colspan="5">
+          <div id="div-news-list-<%=rows[row].id%>"></div>
+        </td>
+      </tr>
+
+    </table>
+
+  </div>
+
+  <% } %>
+</div>
+  <script type="text/javascript">
+
+    function changeHtml(siteId){
+      var fieldValue = $('#tb-name-' + siteId).val().trim();
+      var data = {
+        siteId: siteId,
+        field: 'name',
+        fieldValue: fieldValue
+      }
+      saveField(data);
+    }
+
+    function change(siteId, field){
+      var fieldValue;
+
+      switch (field) {
+        case 'name':
+          fieldValue = $('#tb-name-' + siteId).val().trim();
+          break;
+        case 'menu_type':
+          fieldValue = $('#cb-menu-type-' + siteId).val().trim();
+          break;
+        case 'visible':
+          fieldValue = 0;
+          if (document.getElementById('cb-visible-' + siteId).checked){
+            fieldValue = 1;
+          }
+          break;
+        case 'order_field':
+          fieldValue = $('#tb-order-field-' + siteId).val();
+          break;
+        case 'default_page':
+          fieldValue = 0;
+          if (document.getElementById('cb-default-page-' + siteId).checked){
+            fieldValue = 1;
+          }
+          break;
+        case 'tooltip':
+          fieldValue = $('#tb-tooltip-' + siteId).val().trim();
+          break;
+        case 'content':
+          fieldValue = '';
+          for (var i=0; i<editors.length; i++) {
+            if (editors[i].id == siteId){
+              fieldValue = editors[i].editor.getContents();
+            }
+          }
+          break;
+        default:
+          Util.showErrorNotificationBar('Ismeretlen mező típus!');
+          return;
+      }
+
+      var data =  {
+        siteId: siteId,
+        field: field,
+        fieldValue: fieldValue
+      };
+      saveField(data);
+    }
+
+    function showDetail(siteId){
+
+      if (document.getElementById('hd-expand-' + siteId).value==0){
+        document.getElementById('hd-expand-' + siteId).value= "1";
+        document.getElementById('img-action-' + siteId).src="images/arrow_up.png";
+        var siteType = $('#cb-menu-type-' + siteId).val().trim();
+        if(siteType == 'ALAP'){
+          $('#tr-title-' + siteId).show();
+          $('#tr-content-title-' + siteId).show();
+          $('#tr-content-' + siteId).show();
+        }
+        else if (siteType == 'NEWS'){
+          $('#tr-content-news-' + siteId).show();
+          refreshNews(siteId);
+        }
+
+      }
+      else {
+        document.getElementById('hd-expand-' + siteId).value = "0";
+        document.getElementById('img-action-' + siteId).src="images/arrow_down.png";
+        $('#tr-title-' + siteId).hide();
+        $('#tr-content-title-' + siteId).hide();
+        $('#tr-content-' + siteId).hide();
+        $('#tr-content-news-' + siteId).hide();
+      }
+    }
+
+      function saveField(params){
+
+        console.log(params.field);
+        console.log(params.fieldValue);
+        $.ajax({
+           url: "../rest/saveSiteField.php",
+           type: 'POST',
+           data: JSON.stringify(params),
+           success: function(data){
+                 if (data == 'INSERT'){
+                   cancelNew();
+                   Util.showNotificationBar('Sikeres menü felvétel');
+                 }
+                 else if ((params.field == 'default_page') && (params.fieldValue == '1')) {
+                   $('[id^=cb-default-page]').each(function(){
+                      if (('cb-default-page-' + params.siteId) != $(this).prop("id")) {
+                        $(this).removeAttr('checked'); //todo.innenfolytatni
+                      }
+                   });
+                 }
+           },
+           error: function(response) {
+              Util.handleErrorResponse(response);
+           }
+          });
+      }
+
+      function addMenu(){
+        $('#img-add').attr('disabled','disabled').css('opacity',0.5);
+        $('#img-refresh').attr('disabled', 'disabled').css('opacity', 0.5);
+        $('#tb-add-new-menu').val('');
+        $('#div-add-new').show();
+        $('#div-menu-list').hide();
+      }
+
+      function cancelNew(){
+        refreshMenu();
+      }
+
+      function sendNew(){
+
+        var fieldValue = $('#tb-add-new-menu').val().trim();
+        if (Util.isNullOrEmpty(fieldValue)){
+          Util.showErrorNotificationBar('Menu megadása kötelező!');
+          return;
+        }
+
+        var data =  {
+          siteId: null,
+          field: 'name',
+          fieldValue: fieldValue
+        };
+        saveField(data);
+      }
+
+      function deleteSite(siteId){
+        var data = JSON.stringify({siteId: siteId});
+        $.ajax({
+           url: "../rest/removeSiteField.php",
+           type: 'POST',
+           data: data,
+           success: function(data){
+             refreshMenu();
+             Util.showNotificationBar('Sikeres menü törlés');
+           },
+           error: function(response) {
+              Util.handleErrorResponse(response);
+           }
+          });
+      }
+
+      function showSample(siteId){
+        window.open('sample.php?page=' + siteId, '_blank');
+      }
+
+      function refreshNews(siteId){
+        var url = new URL(baseUrl + '/rest/getNews.php');
+        url.searchParams.set('page', siteId);
+        url.searchParams.set('first', 0);
+        url.searchParams.set('last', 9000000);
+        url.searchParams.set('html', 0);
+        url.searchParams.set('x', Date.now());
+
+        $.ajax({
+              url: url.href,
+              type: 'GET',
+              success: function(data){
+                if (data){
+                  $.get("../templates/newsList.html?x=" + Util.getCurrentDate()).then(function(text, status, xhr){
+                    var template = _.template(text);
+      			    	    $('#div-news-list-'+ siteId).html(template({
+                        rows: data,
+                        lastRefresh: Util.getCurrentDateTime(),
+                        siteId: siteId
+                      }));
+                  });
+
+                }
+              },
+              error:function(response) {
+                Util.handleErrorResponse(response);
+              }
+          });
+      }
+
+
+  </script>
+
+</div>

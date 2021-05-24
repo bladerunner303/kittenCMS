@@ -1,0 +1,48 @@
+<div style="margin: auto;padding: 10px;">
+
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshVisitorsCount();" title="Látogatok számának frissitése" style="width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table style="width:100%">
+    <tr>
+      <td>
+        <div id="chart-container" style="max-width:350px;max-height:350px;background-color: white; margin-left: auto; margin-right: auto;">
+          <canvas id="visitor-count-chart-canvas" style="width:350px;height:350px"></canvas>
+        </div>
+      </td>
+      <td style="vertical-align: top; width: 90%">
+        <table cellspacing="0" style="font-size: 12px; width: 100%">
+          <thead >
+            <tr>
+              <td style="border-bottom:1px solid grey">Menü név&nbsp;</td>
+              <td style="border-bottom:1px solid grey">Oldal töltés száma &nbsp;</td>
+              <td style="border-bottom:1px solid grey">Egyedi látogatók&nbsp;</td>
+            <tr>
+            </thead>
+            <tbody>
+
+            <% for(var row in rows) { %>
+              <tr>
+                <td style="width:60%;padding:5px;">
+                  <%-rows[row].menu_name%>&nbsp;
+                </td>
+                <td>
+                  <%-rows[row].all_page_load%>&nbsp;
+                </td>
+                <td>
+                  <%-rows[row].visitor_count%>&nbsp;
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+</div>

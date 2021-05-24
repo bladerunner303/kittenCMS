@@ -1,0 +1,38 @@
+<div id="next-news-10"></div>
+<div style="text-align:center; width: 100%">
+<button id="bt-more-news" onclick="nextNews();">Továbbiak</button>
+<input type="hidden" id="hd-news-count" value="10"></input>
+</div>
+<script type="text/javascript">
+  function nextNews(){
+    var page = Util.nvl(Util.getQueryVariable("page"), '');
+    var newsCount = parseInt($("#hd-news-count").val());
+    var url = new URL(baseUrl + "/rest/getNews.php");
+    url.searchParams.set("page", page);
+    url.searchParams.set("first", newsCount);
+    url.searchParams.set("last", newsCount + 9);
+    url.searchParams.set("html", 1);
+    url.searchParams.set("x", Date.now());
+
+    $.ajax({
+        url: url.href,
+        type: "GET",
+        success: function(data){
+
+          if (data){
+            var newNewsCount = newsCount + 10;
+            data += '<div id="news-count-' + newNewsCount + '></div>';
+            $("#next-news-" + newsCount).html(data);
+            $("#hd-news-count").val(newNewsCount);
+          }
+          else {
+            $('#bt-more-news').hide();
+          };
+
+        },
+        error:function(response) {
+          Util.handleErrorResponse(response);
+        }
+    });
+  }
+</script>

@@ -1,0 +1,54 @@
+<div style="margin: auto;padding: 10px;">
+
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png"
+        onclick="<%-refreshFunc%>"
+        title="<%-refreshTitle%>"
+        style="width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <div id="chart-container"
+         style="max-width:350px;max-height:350px;background-color: white;
+         margin-left: auto; margin-right: auto; padding-bottom: 10px;">
+          <canvas id="<%-chartCanvasId%>" style="width: 350px;height:350px;"></canvas>
+        </div>
+      </td>
+      <td style="vertical-align: top;width:90%">
+        <table cellspacing="0" style="font-size: 12px; width: 100%">
+          <thead >
+            <tr>
+              <td style="border-bottom:1px solid grey"><%-col1Name%>&nbsp;</td>
+              <td style="border-bottom:1px solid grey"><%-col2Name%> &nbsp;</td>
+              <td style="border-bottom:1px solid grey"><%-col3Name%>&nbsp;</td>
+            </tr>
+            </thead>
+            <tbody>
+
+            <% for(var row in rows) { %>
+              <tr>
+                <td style="width:60%;padding:5px;">
+                  <%-rows[row].item_name%>&nbsp;
+                </td>
+                <td>
+                  <%-rows[row].item_count%>&nbsp;
+                </td>
+                <td>
+                  <%-rows[row].item_percent%>&nbsp;
+                </td>
+              </tr>
+              <% } %>
+
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+</div>

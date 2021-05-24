@@ -1,0 +1,135 @@
+<div style="margin: auto;padding: 10px;">
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshFiles();" title="Fájl lista frissitése" style="width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table cellspacing="0" style="font-size: 12px; width: 100%">
+    <thead >
+      <tr>
+        <td style="border-bottom:1px solid grey">Fájl név&nbsp;</td>
+        <td style="border-bottom:1px solid grey">Méret &nbsp;</td>
+        <td style="border-bottom:1px solid grey">Módosítva&nbsp;</td>
+        <td style="border-bottom:1px solid grey">Műveletek&nbsp;</td>
+      <tr>
+      </thead>
+      <tbody>
+
+      <% for(var row in rows) { %>
+      <tr>
+        <td style="width:60%;padding:5px;">
+          <%-rows[row].name%>&nbsp;
+        </td>
+        <td>
+          <%-rows[row].size%>&nbsp;
+        </td>
+        <td>
+          <%-rows[row].modified%>&nbsp;
+        </td>
+        <td style="padding:5px;">
+          <a href="../uploads/<%=rows[row].name%>" title="Fájl letöltése"
+            style="cursor:pointer;display:inline;padding:1px;text-decoration: none;" target="_blank">
+            <img src="images/download.png" />
+          </a>
+          <a title="Fájl végleges törlése"
+          style="cursor:pointer;display:inline;padding:1px;"
+          onclick="Util.confirm('Fájl törlés', 'Valóban töröljük a <%=rows[row].name%> fájlt? A művelet nem visszavonható', deleteFile, '<%=rows[row].name%>');"
+          >
+            <img src="images/delete.png"  />
+          </a>
+          <a title="A fájl linkje"
+          style="cursor:pointer;display:inline;padding:1px;"
+          onclick="showLink('<%=rows[row].name%>');">
+            <img src="images/document.png" style="width: 24px;height: 32px; cursor:pointer"  />
+          </a>
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <div style="border: solid 1px grey; padding: 12px">
+
+    <form enctype="multipart/form-data" >
+        <input name="file" type="file" onchange="checkFileSize();" id="choose-file"/>
+        <input type="button" value="Feltöltés" onclick="upload();" id="bt-upload-file" disabled="disabled" />
+    </form>
+
+  </div>
+  <progress style="display:none"></progress>
+
+  <script type="text/javascript">
+
+    function checkFileSize(){
+      var file = $('#choose-file').prop('files')[0];
+
+      if (file.size > <%-maxFileSizeByte%>) {
+        $('#bt-upload-file').prop('disabled', true);
+        Util.showErrorNotificationBar('Maximum fájl méret <%-maxFileSizeMB%>mb lehetséges');
+        return;
+      }
+      else {
+        $('#bt-upload-file').prop('disabled', false);
+      }
+    }
+
+    function deleteFile(fileName){
+      var data = JSON.stringify({
+        'fileName': fileName
+      });
+
+      $.ajax({
+         url: "../rest/removeFile.php",
+         type: 'POST',
+         data: data,
+         success: function(data){
+               refreshFiles();
+               Util.showNotificationBar('A ' + fileName + ' törlésre került!');
+         },
+         error: function(response) {
+             Util.handleErrorResponse(response);
+         }
+       });
+
+    }
+
+    function upload(){
+
+      var selectedFileName = $('#choose-file').val();
+      if (Util.isNullOrEmpty(selectedFileName)){
+        Util.showErrorNotificationBar("Fájlt kell választani!");
+        return;
+      }
+
+      $.ajax({
+          url: '../rest/upload.php',
+          type: 'POST',
+          data: new FormData($('form')[0]),
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function(data){
+                refreshFiles();
+              //  Util.showNotificationBar('A ' + fileName + ' törlésre került!');
+          },
+          error: function(response) {
+              Util.handleErrorResponse(response);
+          }
+
+        });
+      }
+
+    function showLink(fileName){
+      var messageHtml = '<a href="mylink" target="_blank">mylink</a>';
+      messageHtml = messageHtml.split('mylink').join(
+        window.location.href.split('admin/content.php?menu=files').join('uploads/'+ fileName)
+      );
+      Util.showSimpleDialog("Fájl linkje", messageHtml);
+    }
+
+  </script>
+
+</div>

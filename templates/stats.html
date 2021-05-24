@@ -1,0 +1,344 @@
+<div style="margin: auto;padding: 10px;">
+
+  <div style="padding: 10px;">
+    <span>Dátum tól:&nbsp;</span>
+    <input type="text" id="tb-date-from" onchange="refreshActiveTab()"/>
+    <span>&nbsp;ig:&nbsp;</span>
+    <input type="text" id="tb-date-to" onchange="refreshActiveTab()"/>
+    <span>&nbsp;&nbsp;</span>
+    <select id="cb-fix-interval" onchange="setDateInterval()">
+      <option value="nothing">&nbsp;</option>
+      <option value="lastDay">Utolsó nap</option>
+      <option value="lastWeek">Utolsó hét</option>
+      <option value="lastMonth">Utolsó hónap</option>
+      <option value="lastYear">Utolsó év</option>
+    </select>
+  </div>
+
+  <div id="tabs-stats" style="display:none">
+
+    <ul>
+      <li><a href="#tab-visitors-count" onclick="refreshVisitorsCount()">Látogatok száma</a></li>
+      <li><a href="#tab-country" onclick="refreshCountry()">Országok</a></li>
+      <li><a href="#tab-region" onclick="refreshRegion()">Régiók</a></li>
+      <li><a href="#tab-city" onclick="refreshCity()">Városok</a></li>
+      <li><a href="#tab-browsers" onclick="refreshBrowsers()">Böngészők</a></li>
+      <li><a href="#tab-os" onclick="refreshOs()">Op. rendszer</a></li>
+    </ul>
+
+    <div id="tab-visitors-count">
+      <div id="div-visitors-count"></div>
+    </div>
+    <div id="tab-country">
+      <div id="div-country"></div>
+    </div>
+    <div id="tab-region">
+      <div id="div-region"></div>
+    </div>
+    <div id="tab-city">
+      <div id="div-city"></div>
+    </div>
+    <div id="tab-browsers">
+      <div id="div-browsers">anyád</div>
+    </div>
+    <div id="tab-os">
+        <div id="div-os"></div>
+    </div>
+  </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+  $( function() {
+    $( "#tabs-stats" ).tabs().show();
+    $('#tb-date-from').datepicker(Util.getDefaultDatePicker("-10:+0"));
+    $('#tb-date-to').datepicker(Util.getDefaultDatePicker("-10:+0"));
+    refreshVisitorsCount();
+  } );
+
+  function getStatsRestUrl(){
+    return  new URL(baseUrl + '/rest/getStats.php');
+  }
+
+  function getSearchDateFrom(){
+        var dateFrom = $('#tb-date-from').val();
+        if (Util.isNullOrEmpty(dateFrom)){
+          return '2000-01-01';
+        }
+        else {
+          return dateFrom;
+        }
+  }
+
+  function getSearchDateTo(){
+    var dateTo = $('#tb-date-to').val();
+    if (Util.isNullOrEmpty(dateTo)){
+      return '2100-01-01';
+    }
+    else {
+      return dateTo;
+    }
+  }
+
+  function refreshVisitorsCount(){
+
+    var url = getStatsRestUrl();
+    url.searchParams.set('statType', 'visitorsCount');
+    url.searchParams.set('dateFrom', getSearchDateFrom());
+    url.searchParams.set('dateTo',getSearchDateTo());
+    url.searchParams.set('x', Date.now());
+
+    $.ajax({
+          url: url.href,
+          type: 'GET',
+          success: function(data){
+            if (data){
+              $.get("../templates/statsVisitorsCount.html?x=" + Util.getCurrentDate()).then(function(text, status, xhr){
+                var template = _.template(text);
+  			    	  $('#div-visitors-count').html(template({rows: data, lastRefresh: Util.getCurrentDateTime()}));
+                var chartData = [];
+                for (var i = 0; i < data.length; i++) {
+                  chartData.push({item_name: data[i].menu_name, item_count: data[i].all_page_load});
+                }
+                setChart(chartData, "Látogatok száma", "visitor-count-chart-canvas");
+              });
+            }
+          },
+          error:function(response) {
+            Util.handleErrorResponse(response);
+          }
+      });
+  }
+
+  function refreshVisitorsTrend(){
+
+  }
+
+  function getDiagramColors(index){
+    var colors = ['red', 'green', 'orange','blue', 'yellow', 'brown', 'pink' ];
+    if (colors.length > index){
+      return colors[index];
+    }
+    else {
+      return "#" + Math.floor(Math.random()*16777215).toString(16);
+    }
+
+  }
+
+  function setChart(currentData, title, chartCanvasId){
+    if (currentData.length>0){
+      var data = {datasets: [{
+              fill: true,
+              backgroundColor: [],
+              data: [],
+              borderColor: ['grey', 'grey'],
+              borderWidth: [2,2]
+      }], labels: []};
+      for (var i = 0; i < currentData.length; i++) {
+        data.labels.push(currentData[i].item_name);
+        data.datasets[0].data.push(currentData[i].item_count);
+        data.datasets[0].backgroundColor.push(getDiagramColors(i));
+      }
+
+      var options = {
+              title: {
+                        display: true,
+                        text: title,
+                        position: 'top'
+                    },
+              rotation: -0.7 * Math.PI
+      };
+      var ctx = document.getElementById(chartCanvasId).getContext('2d');
+      var myPieChart = new Chart(ctx, {
+          type: 'pie',
+          data: data,
+          options: options
+      });
+    }
+
+  }
+
+  function refreshGeneralStat(paramObj){
+  var url = getStatsRestUrl();
+  url.searchParams.set('statType', paramObj.statType);
+  url.searchParams.set('dateFrom', getSearchDateFrom());
+  url.searchParams.set('dateTo',getSearchDateTo());
+  url.searchParams.set('x', Date.now());
+
+  $.ajax({
+        url: url.href,
+        type: 'GET',
+        success: function(data){
+          if (data){
+            var allPageLoad = 0;
+            for (var i = 0; i < data.length; i++) {
+              allPageLoad += parseInt(data[i].item_count);
+            }
+
+            for (var i = 0; i < data.length; i++) {
+              data[i].item_percent = (parseInt(data[i].item_count)/allPageLoad*100).toFixed(2);
+            }
+
+            $.get("../templates/statsTempl.html?x=" + Util.getCurrentDate()).then(function(text, status, xhr){
+              var template = _.template(text);
+              $('#' + paramObj.targetDiv).html(template({
+                rows: data,
+                lastRefresh: Util.getCurrentDateTime(),
+                refreshFunc: paramObj.refreshFunc,
+                refreshTitle: paramObj.refreshTitle,
+                col1Name: paramObj.col1Name,
+                col2Name: paramObj.col2Name,
+                col3Name: paramObj.col3Name,
+                chartCanvasId: paramObj.chartCanvasId
+              }));
+              setChart(data, paramObj.chartTitle, paramObj.chartCanvasId);
+            });
+          }
+        },
+        error:function(response) {
+          Util.handleErrorResponse(response);
+        }
+    });
+
+}
+
+  function refreshBrowsers(){
+    refreshGeneralStat({
+      statType: 'browserStats',
+      refreshFunc: 'refreshBrowsers()',
+      refreshTitle: 'Böngésző statiszitkák frissitése',
+      col1Name: 'Böngésző',
+      col2Name: 'Oldaltöltés',
+      col3Name: 'Darabszám',
+      targetDiv: 'div-browsers',
+      chartTitle: 'Böngészó megoszlás',
+      chartCanvasId: 'canvas-browser-chart'
+    });
+   }
+
+  function refreshOs(){
+    refreshGeneralStat({
+      statType: 'osStats',
+      refreshFunc: 'refreshOs()',
+      refreshTitle: 'Op.rendszer statiszitkák frissitése',
+      col1Name: 'Op.rendszer',
+      col2Name: 'Oldaltöltés',
+      col3Name: 'Darabszám',
+      targetDiv: 'div-os',
+      chartTitle: 'Op. rendszer megoszlás',
+      chartCanvasId: 'canvas-os-chart'
+    });
+
+  }
+
+  function refreshCity(){
+    refreshGeneralStat({
+      statType: 'cityStat',
+      refreshFunc: 'refreshCity()',
+      refreshTitle: 'Látogatók városainak frissitése',
+      col1Name: 'Város',
+      col2Name: 'Oldaltöltés',
+      col3Name: 'Darabszám',
+      targetDiv: 'div-city',
+      chartTitle: 'Városok megoszlása',
+      chartCanvasId: 'canvas-city-chart'
+    });
+   }
+
+   function refreshRegion(){
+     refreshGeneralStat({
+       statType: 'regionStat',
+       refreshFunc: 'refreshRegion()',
+       refreshTitle: 'Látogatók régiójának frissitése',
+       col1Name: 'Régió',
+       col2Name: 'Oldaltöltés',
+       col3Name: 'Darabszám',
+       targetDiv: 'div-region',
+       chartTitle: 'Régiók megoszlása',
+       chartCanvasId: 'canvas-region-chart'
+     });
+    }
+
+    function refreshCountry(){
+      refreshGeneralStat({
+        statType: 'countryStat',
+        refreshFunc: 'refreshCountry()',
+        refreshTitle: 'Látogatók országainak frissitése',
+        col1Name: 'Országok',
+        col2Name: 'Oldaltöltés',
+        col3Name: 'Darabszám',
+        targetDiv: 'div-country',
+        chartTitle: 'Országok megoszlása',
+        chartCanvasId: 'canvas-country-chart'
+      });
+     }
+
+    function setDateInterval(){
+      var intervalType = $('#cb-fix-interval').val();
+      var d1 = new Date();
+      var d2;
+
+      switch (intervalType) {
+        case "lastDay":
+          d2 = new Date(d1.getTime() - (1 * 24 * 60 * 60 * 1000));
+          break;
+        case "lastWeek":
+          d2 = new Date(d1.getTime() - (7 * 24 * 60 * 60 * 1000));
+          break;
+        case "lastMonth":
+          d2 = new Date(d1.getTime() - (30 * 24 * 60 * 60 * 1000));
+          break;
+        case "lastYear":
+          d2 = new Date(d1.getTime() - (365 * 24 * 60 * 60 * 1000));
+          break;
+        default:
+          //todo nothing
+      }
+      $('#tb-date-from').val(d2.getFullYear() + "-" +
+                            Util.pad(d2.getMonth()+1, 2) + "-" +
+                            Util.pad(d2.getDate(), 2));
+      $('#tb-date-to').val(d1.getFullYear() + "-" +
+                            Util.pad(d1.getMonth()+1, 2) + "-" +
+                            Util.pad(d1.getDate(), 2));
+      refreshActiveTab();
+    }
+
+    function refreshActiveTab(){
+      var tabIndex = $("#tabs-stats div[aria-hidden='false']").index();
+      switch (tabIndex) {
+        case 1:
+          refreshVisitorsCount();
+          break;
+        case 2:
+          refreshCountry();
+          break;
+        case 3:
+          refreshRegion();
+          break;
+        case 4:
+          refreshCity();
+          break;
+        case 5:
+          refreshBrowsers();
+          break;
+        case 6:
+          refreshOs();
+          break;
+        default:
+          break;
+      }
+    }
+
+</script>
+
+
+<!--
+  - Látogatok száma oldalanként (összes, egyedi) (időszakra, alapból az elmúlt egy év);
+  - Látogatok változása (összes egyedi) (időszakra, alapból az elmúlt egy hónap )
+  - Böngészési környezet
+    - böngészők, op rendszer,
+  - Böngészök helye
+    - böngészök földrajzi megoszlása
+-->

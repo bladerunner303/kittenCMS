@@ -1,0 +1,331 @@
+<div style="margin: auto;padding: 10px;">
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshUsers();"
+        title="Felhasználók frissitése"
+        style="width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table style="border: solid gray 1px; font-size: 12px; width: 100%">
+    <tr style="border: solid gray 1px;">
+      <td>Felhasználó név</td>
+      <td>Jogosultság</td>
+      <td>Státusz</td>
+      <td>Utolsó bejelentkezés</td>
+      <td>Utolsó jelszó csere</td>
+      <td>Aktiv session</td>
+      <td>Hibás login</td>
+      <td>Utolsó módosító</td>
+      <td>Műveletek</td>
+    </tr>
+    <% for(var row in rows) { %>
+    <tr>
+      <td style="width:10%;padding:5px;"><%-rows[row].user_name%>&nbsp;</td>
+      <td style="padding:5px;">
+        <select id="cb-user-role-<%=rows[row].user_name%>"
+        <% if (currentUserRole != 'ADMIN') { print('disabled');} %>
+        onchange="saveUser('<%=rows[row].user_name%>', false);"
+        style="width: 150px;">
+						<% for(var role in roles) { %>
+										<option value="<%-roles[role].key%>"
+										<% if (roles[role].key == rows[row].role) { print('selected="selected"');} %> >
+										<%-roles[role].name%>
+										</option>
+									<% } %>
+							</select>
+        &nbsp;
+      </td>
+      <td style="padding:5px;">
+        <select id="cb-user-status-<%=rows[row].user_name%>"
+        <% if (currentUserRole != 'ADMIN') { print('disabled');} %>
+        onchange="saveUser('<%=rows[row].user_name%>', false);" style="width: 150px;">
+						<% for(var status in statuses) { %>
+										<option value="<%-statuses[status].key%>"
+										<% if (statuses[status].key == rows[row].status) { print(' selected="selected"');} %>>
+										<%-statuses[status].name%>
+										</option>
+									<% } %>
+							</select>
+        &nbsp;
+      </td>
+
+      <td><%-rows[row].last_login%></td>
+      <td><%-rows[row].last_pwd_change%></td>
+      <td><%-rows[row].active_session%></td>
+      <td><%-rows[row].bad_logins%></td>
+      <td style="padding:5px;">
+        <%-rows[row].modified%>(<%-rows[row].modifier%>)&nbsp;
+      </td>
+
+      <td>
+        <button onclick="createNewPassword('<%=rows[row].user_name%>');"
+          title="Új jelszó megadása a felhasználónak">Új jelszó</button>
+        <button onclick="killUserSessions('<%=rows[row].user_name%>');"
+          title="Felhasználó aktuális session-jeinek megszüntetése">Kilökés</button>
+      </td>
+    </tr>
+    <% } %>
+  </table>
+
+  <button onclick="openUserDialog();" id="bt-add-new-user"
+  <% if (currentUserRole != 'ADMIN') { print('style="display:none;"');} %>
+  >Új felhasználó</button>
+  <div id="div-add-new-user" style="display:none">
+    <table>
+      <tr>
+        <td>Felhasználó név: &nbsp;</td>
+        <td><input type="text" id="add-new-user-name" maxlength="20" style="width: 250px;"
+              title="Felhasználó név nem tartalmazhat, csak az angol abc betűit illetve számokat"
+          /></td>
+      </tr>
+      <tr>
+        <td>Jogosultság: &nbsp;</td>
+        <td><select id="add-new-user-role" style="width: 266px;">
+						<% for(var role in roles) { %>
+										<option value="<%-roles[role].key%>"
+										<% if (roles[role].key == 'EDITOR') { print('selected="selected"');} %> >
+										<%-roles[role].name%>
+										</option>
+									<% } %>
+							</select>
+        &nbsp;</td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table><tr><td><img src="images/info_little.png"/></td>
+            <td>
+          A létrejövő új felhasználó első jelszava megegyezik a felhasználó névvel!
+          </td>
+          </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="div-pwd-change" style="display:none">
+
+    <table>
+      <tr>
+        <td colspan="2">
+          <span id="sp-user-name"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Új jelszó
+        </td>
+        <td>
+          <input type="password" id="new-password"  maxlength="20" title="Új jelszó"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Új jelszó megint
+        </td>
+        <td>
+          <input type="password" id="new-password-2"  maxlength="20" title="Új jelszó mégegyszer"/>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script type="text/javascript">
+
+    $('#div-add-new-user').dialog({
+      autoOpen: false,
+      height: 270,
+      width: 500,
+      modal: true,
+      title: "Új felhasználó felvitele",
+      buttons: {
+        "Mentés": function() {
+            saveUser(clearUserName($('#add-new-user-name').val().trim()), true);
+        },
+        "Mégse": function() {
+          cancelNewUser();
+        }
+      },
+      close: function() {
+        cancelNewUser();
+      }
+    });
+
+
+    $('#div-pwd-change').dialog({
+      autoOpen: false,
+      height: 270,
+      width: 500,
+      modal: true,
+      title: "Jelszó cseréje",
+      buttons: {
+        "Jelszó csere": function() {
+            changePassword();
+        },
+        "Mégse": function() {
+          cancelPasswordChange();
+        }
+      },
+      close: function() {
+        cancelPasswordChange();
+      }
+    });
+
+
+    function createNewPassword(userName){
+      $('#div-pwd-change').dialog('open');
+      $('#sp-user-name').text(userName);
+    }
+
+    function changePassword(){
+
+      var newPassword = $('#new-password').val();
+      var newPasswordAgain = $('#new-password-2').val();
+      var minPasswordLength = 4;
+      var result = '';
+
+      if (newPassword != newPasswordAgain) {
+             result = "Nem egyezik a két új jelszó!";
+      }
+
+      if (newPassword < minPasswordLength){
+        result = "Az új jelszónak minimum 4 karakter hosszúnak kell lennie!";
+      }
+
+      if (!Util.isNullOrEmpty(result)){
+        Util.showErrorNotificationBar(result);
+      }
+      else {
+           var data = JSON.stringify({
+             'userName': $('#sp-user-name').text()
+            ,'newPassword': newPassword
+        });
+
+        $.ajax({
+            url: "../rest/changePassword.php",
+            type: 'POST',
+            data: data,
+            success: function(data){
+                  cancelPasswordChange();
+                  Util.showNotificationBar('Sikeres jelszó módosítás történt!', 2000, 'grey', 'white');
+            },
+            error: function(response) {
+                Util.handleErrorResponse(response);
+            }
+        });
+      }
+    }
+
+    function cancelPasswordChange(){
+      $('#div-pwd-change').dialog('close');
+      $('#sp-user-name').text('');
+      $('#new-password').val('');
+      $('#new-password-2').val('');
+    }
+
+
+    function openUserDialog(){
+      $('#bt-add-new-user').hide();
+      $('#div-add-new-user').dialog('open');
+    }
+
+    function clearUserName(dirtyUserName){
+      var enabledChars = "abcdefghijklmnopqrstzvwyxABCDEFGHIJKLMNOPQRSTZVWYX0123456789";
+
+      dirtyUserName = dirtyUserName.split('á').join('a');
+      dirtyUserName = dirtyUserName.split('Á').join('A');
+      dirtyUserName = dirtyUserName.split('Ä').join('A');
+      dirtyUserName = dirtyUserName.split('ä').join('a');
+      dirtyUserName = dirtyUserName.split('é').join('e');
+      dirtyUserName = dirtyUserName.split('É').join('E');
+      dirtyUserName = dirtyUserName.split('ö').join('o');
+      dirtyUserName = dirtyUserName.split('Ö').join('O');
+      dirtyUserName = dirtyUserName.split('ő').join('o');
+      dirtyUserName = dirtyUserName.split('Ő').join('O');
+      dirtyUserName = dirtyUserName.split('ó').join('o');
+      dirtyUserName = dirtyUserName.split('Ó').join('O');
+      dirtyUserName = dirtyUserName.split('ú').join('u');
+      dirtyUserName = dirtyUserName.split('Ú').join('U');
+      dirtyUserName = dirtyUserName.split('ü').join('u');
+      dirtyUserName = dirtyUserName.split('Ü').join('U');
+      dirtyUserName = dirtyUserName.split('ű').join('u');
+      dirtyUserName = dirtyUserName.split('Ű').join('U');
+      dirtyUserName = dirtyUserName.split('í').join('i');
+      dirtyUserName = dirtyUserName.split('Í').join('i');
+
+      var ret = "";
+      for (var i = 0; i < dirtyUserName.length; i++) {
+        if (enabledChars.indexOf(dirtyUserName.charAt(i)) >= 0) {
+            ret += dirtyUserName.charAt(i);
+        }
+
+      }
+      return ret;
+
+    }
+
+    function cancelNewUser(){
+      $('#div-add-new-user').dialog('close');
+      $('#bt-add-new-user').show();
+      $('#add-new-user-name').val('');
+      $('#add-new-user-role').val('EDITOR');
+    }
+
+    function saveUser(userName, isNew){
+
+      var data ={};
+      if (isNew){
+        data = JSON.stringify({
+          'userName':userName
+          ,'userRole':$('#add-new-user-role').val().trim()
+          ,'status':'AKTIV'
+        });
+      }
+      else {
+          data = JSON.stringify({
+            'userName':userName
+            ,'userRole':$('#cb-user-role-'+userName).val().trim()
+            ,'status':$('#cb-user-status-'+userName).val().trim()
+          });
+      }
+
+      $.ajax({
+          url: "../rest/saveUser.php",
+          type: 'POST',
+          data: data,
+          success: function(data){
+                refreshUsers();
+                cancelNewUser();
+          },
+          error: function(response) {
+              Util.handleErrorResponse(response);
+          }
+         });
+
+    }
+
+    function killUserSessions(userName){
+      var data = JSON.stringify({
+        'userName':userName
+      });
+      $.ajax({
+          url: "../rest/killUserSessions.php",
+          type: 'POST',
+          data: data,
+          success: function(data){
+                refreshUsers();
+                Util.showNotificationBar('A ' + data + ' felhasználó minden session-jét megszüntettük.');
+          },
+          error: function(response) {
+              Util.handleErrorResponse(response);
+          }
+         });
+    }
+
+
+  </script>
+
+</div>

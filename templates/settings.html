@@ -1,0 +1,94 @@
+<div style="margin: auto;padding: 10px;">
+  <table>
+    <tr>
+      <td>
+        <img src="images/refresh.png" onclick="refreshSettings();" title="Beállítások frissitése" style="width: 32px; height: 32px;cursor:pointer;"/>
+      </td>
+      <td style="width:100%;text-align:right;font-size: 10px;">Utolsó frissités: <%-lastRefresh%>&nbsp;</td>
+    </tr>
+  </table>
+  <table style="border: solid gray 1px; font-size: 12px; width: 100%">
+    <% for(var row in rows) { %>
+    <tr>
+      <td style="width:10%;padding:5px;">
+        <%-rows[row].setting_key%>&nbsp;
+      </td>
+      <td style="width: 20%;padding:5px;">
+        <% if (rows[row].setting_type == 'TEXT') { %>
+        <input type="text"style="width:240px"
+        onchange="saveSetting('<%=rows[row].setting_key%>', '<%=rows[row].setting_type%>');"
+        id="tb-<%=rows[row].setting_key%>" value="<%-rows[row].setting_value%>"/>&nbsp;
+        <% } %>
+
+        <% if (rows[row].setting_type == 'TEXTAREA') { %>
+        <textarea
+        onchange="saveSetting('<%=rows[row].setting_key%>', '<%=rows[row].setting_type%>');"
+        id="tb-<%=rows[row].setting_key%>" style="width: 250px" ><%-rows[row].setting_value%></textarea>&nbsp;
+        <% } %>
+
+        <% if (rows[row].setting_type == 'BOOLEAN') { %>
+        <input type="checkbox"
+        onchange="saveSetting('<%=rows[row].setting_key%>', '<%=rows[row].setting_type%>');"
+        id="tb-<%=rows[row].setting_key%>"
+          <% if (rows[row].setting_value == '1') { %>
+            checked
+          <% } %>/>&nbsp;
+        <% } %>
+
+      </td>
+      <td style="width: 50%;padding:5px;">
+        <%-rows[row].setting_description%>&nbsp;
+      </td>
+      <td style="width: 20%;padding:5px;">
+        <%-rows[row].modified%>(<%-rows[row].modifier%>)&nbsp;
+      </td>
+    </tr>
+    <% } %>
+  </table>
+
+
+  <script type="text/javascript">
+
+
+    function saveSetting(settingKey, settingType){
+
+      var settingValue = null;
+      switch (settingType) {
+        case 'TEXT':
+        case 'TEXTAREA':
+          settingValue = $("#tb-" + settingKey ).val().trim();
+          break;
+        case 'BOOLEAN':
+          settingValue = 0;
+          if (document.getElementById("tb-" + settingKey).checked){
+            settingValue = 1;
+          }
+          break;
+      }
+
+      //if (Util.isNullOrEmpty(settingValue)){
+      if (_.isNull(settingValue) || _.isUndefined(settingValue)){
+        Util.showErrorNotificationBar("Beállítás megadása nélkül nem tudjuk menteni");
+      }
+
+      var data = JSON.stringify({
+        'settingKey': settingKey
+       ,'settingValue': settingValue
+   });
+
+   $.ajax({
+       url: "../rest/saveSetting.php",
+       type: 'POST',
+       data: data,
+       success: function(data){
+             refreshSettings();
+       },
+       error: function(response) {
+          Util.handleErrorResponse(response);
+       }
+      });
+    }
+
+  </script>
+
+</div>
