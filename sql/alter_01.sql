@@ -145,7 +145,7 @@ values ('enabled-mobile-view', '1', 'Mobil nézet engedélyezése', 'BOOLEAN', '
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('title', 'Sashalmi plébánia honlapja', 'A weboldal title tulajdonsága', 'TEXT', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
-values ('header-html', '<img src="http://myapps/sashalom/uploads/fejlec.jpg"></img>', 'A weboldal fejléc html sablonja', 'TEXTAREA', 'system', current_timestamp);
+values ('header-html', '', 'A weboldal fejléc html sablonja', 'TEXTAREA', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('header-mobile-html', '', 'A weboldal mobilon megjelenő fejléc html sablonja. Ha nem kerül ide semmi akkor automatikusan a header-html értékét veszi', 'TEXTAREA', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
@@ -161,9 +161,9 @@ values ('content-length', '600px', 'A fő tartalmi szakasz szélessége. Olyan f
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('content-mobile-length', '800px', 'A fő tartalmi szakasz szélessége. Olyan formátumban amit a böngésző css értelmezője elfogad. Ha nem kerül ide semmi automatikusan a content-length értékét veszi', 'TEXT', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
-values ('meta-description', 'Sashalmi plébánia honlapja', 'Az oldal meta leírása (kereső támogatás)', 'TEXT', 'system', current_timestamp);
+values ('meta-description', '', 'Az oldal meta leírása (kereső támogatás)', 'TEXT', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
-values ('meta-keywords', 'plébánia', 'Az oldal meta kulcsszavai (kereső támogatás)', 'TEXT', 'system', current_timestamp);
+values ('meta-keywords', '', 'Az oldal meta kulcsszavai (kereső támogatás)', 'TEXT', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('main-switch', '1', 'Az oldal fő kapcsolója (ha nincs bejelölve akkor az oldal publikus része nem elérhető)', 'BOOLEAN', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
@@ -175,4 +175,4 @@ delete from config_menu where 1=1;
 insert into config_menu(id, name, tooltip, menu_type, content, visible, default_page, order_field, modifier, modified) values
 ('nyitolap', 'Nyitólap', 'Nyitólap', 'NEWS', '', 1, 0, 10, 'system', current_timestamp);
 insert into config_menu(id, name, tooltip, menu_type, content, visible, default_page, order_field, modifier, modified) values
-('elerhetosegek', 'Elérhetőségek', 'Elérhetőségek', 'ALAP','', 1, 0, 110, 'system', current_timestamp);
+('elerhetosegek', 'Elérhetőségek', 'Elérhetőségek', 'ALAP','', 1, 0, 100, 'system', current_timestamp);
