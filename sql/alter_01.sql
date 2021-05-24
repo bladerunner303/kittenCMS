@@ -143,7 +143,7 @@ delete from config_settings where 1=1;
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('enabled-mobile-view', '1', 'Mobil nézet engedélyezése', 'BOOLEAN', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
-values ('title', 'Sashalmi plébánia honlapja', 'A weboldal title tulajdonsága', 'TEXT', 'system', current_timestamp);
+values ('title', '', 'A weboldal title tulajdonsága', 'TEXT', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
 values ('header-html', '', 'A weboldal fejléc html sablonja', 'TEXTAREA', 'system', current_timestamp);
 insert into config_settings (setting_key, setting_value, setting_description, setting_type, modifier, modified)
