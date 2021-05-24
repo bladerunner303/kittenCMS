@@ -70,6 +70,12 @@ class ConfigMenu{
         $pre->execute();
         $sql = str_replace('<%%field_name%%>', 'default_page', $sql);
         break;
+      case 'css':
+        $sql = str_replace('<%%field_name%%>', 'css', $sql);
+        break;
+      case 'js':
+        $sql = str_replace('<%%field_name%%>', 'js', $sql);
+        break;
       default:
         throw new InvalidArgumentException('Nem létező mező');
     }

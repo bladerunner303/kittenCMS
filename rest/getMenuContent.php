@@ -26,7 +26,13 @@ try {
     throw new InvalidArgumentException("Nem található a keresett oldal!");
   }
   $ret = new stdClass();
-  $ret->html = $menu[0]->content;
+  if (!empty($menu[0]->css)){
+      $ret->html = '<style>' . $menu[0]->css . '</style>';
+  }
+  if (!empty($menu[0]->js)){
+      $ret->html = '<script type="text/javascript">' . $menu[0]->js . '</script>';
+  }
+  $ret->html .= '<div>' . $menu[0]->content . '</div>';
   $ret->modified = $menu[0]->modified;
 
   if ($menu[0]->menu_type == 'NEWS'){

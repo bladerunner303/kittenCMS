@@ -138,6 +138,29 @@
         </td>
       </tr>
 
+      <tr id="tr-css-<%=rows[row].id%>" style="display:none;">
+        <td colspan="5">
+          css<br>
+          <textarea
+          id="tb-css-<%=rows[row].id%>"
+          style="height:120px;width:100%"
+          onchange="change('<%=rows[row].id%>', 'css');"><%=rows[row].css%></textarea>
+        </td>
+      </tr>
+
+
+      <tr id="tr-js-<%=rows[row].id%>" style="display:none;">
+        <td colspan="5">
+          Javascript<br>
+          <textarea
+          id="tb-js-<%=rows[row].id%>"
+          style="height:120px;width:100%"
+          onchange="change('<%=rows[row].id%>', 'js');"
+          ><%=rows[row].js%></textarea>
+        </td>
+      </tr>
+
+
       <tr id="tr-content-news-<%=rows[row].id%>" style="display:none;">
         <td colspan="5">
           <div id="div-news-list-<%=rows[row].id%>"></div>
@@ -198,6 +221,12 @@
             }
           }
           break;
+        case 'css':
+          fieldValue = $('#tb-css-' + siteId).val();
+          break;
+        case 'js':
+          fieldValue = $('#tb-js-' + siteId).val();
+          break;
         default:
           Util.showErrorNotificationBar('Ismeretlen mező típus!');
           return;
@@ -221,6 +250,8 @@
           $('#tr-title-' + siteId).show();
           $('#tr-content-title-' + siteId).show();
           $('#tr-content-' + siteId).show();
+          $('#tr-css-' + siteId).show();
+          $('#tr-js-' + siteId).show();
         }
         else if (siteType == 'NEWS'){
           $('#tr-content-news-' + siteId).show();

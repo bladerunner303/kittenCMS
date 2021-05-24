@@ -49,6 +49,8 @@ name		              varchar(50)   null,
 menu_type             varchar(50)   not null, -- ALAP, NEWS
 tooltip		            varchar(255)  null,
 content		            varchar(4000) null,
+css                   varchar(4000) null,
+js                    varchar(4000) null, 
 visible		            integer       not null,
 order_field	          integer       not null,
 default_page          integer       not null,
