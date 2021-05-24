@@ -17,7 +17,6 @@ try {
   $fileSize = $_FILES["file"]["size"];
   $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
-  Logger::info($target_file);
   if (file_exists($target_file)) {
     throw new InvalidArgumentException("A fájl már létezik a szerveren!");
   }
