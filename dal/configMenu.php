@@ -57,7 +57,10 @@ class ConfigMenu{
         $sql = str_replace('<%%field_name%%>', 'tooltip', $sql);
         break;
       case 'content':
-        $sql = str_replace('<%%field_name%%>', 'content', $sql);
+        $sql = str_replace('<%%field_name%%>', 'enabled_editor=1, content', $sql);
+        break;
+      case 'content-no-editor':
+        $sql = str_replace('<%%field_name%%>', 'enabled_editor=0, content', $sql);
         break;
       case 'visible':
         $sql = str_replace('<%%field_name%%>', 'visible', $sql);

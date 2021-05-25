@@ -50,7 +50,8 @@ menu_type             varchar(50)   not null, -- ALAP, NEWS
 tooltip		            varchar(255)  null,
 content		            varchar(4000) null,
 css                   varchar(4000) null,
-js                    varchar(4000) null, 
+js                    varchar(4000) null,
+enabled_editor        integer       not null,
 visible		            integer       not null,
 order_field	          integer       not null,
 default_page          integer       not null,
@@ -174,7 +175,7 @@ insert into config_settings (setting_key, setting_value, setting_description, se
 values ('news-mobile-template', '<fieldset><legend style="font-size:20px"><%%title%%></legend><span><%%content%%></span></fieldset>', 'A hir blokkok mobile html sablonja. <%%title%%> karakterek helyére kerül a cim, <%%content%%> karakterek helyére a hir tartalmi része! Ha nincs itt semmi a news-template értékét veszi.', 'TEXTAREA', 'system', current_timestamp );
 
 delete from config_menu where 1=1;
-insert into config_menu(id, name, tooltip, menu_type, content, visible, default_page, order_field, modifier, modified) values
-('nyitolap', 'Nyitólap', 'Nyitólap', 'NEWS', '', 1, 0, 10, 'system', current_timestamp);
-insert into config_menu(id, name, tooltip, menu_type, content, visible, default_page, order_field, modifier, modified) values
-('elerhetosegek', 'Elérhetőségek', 'Elérhetőségek', 'ALAP','', 1, 0, 100, 'system', current_timestamp);
+insert into config_menu(id, name, tooltip, menu_type, content, enabled_editor, visible, default_page, order_field, modifier, modified) values
+('nyitolap', 'Nyitólap', 'Nyitólap', 'NEWS', '', 1, 1, 0, 10, 'system', current_timestamp);
+insert into config_menu(id, name, tooltip, menu_type, content, enabled_editor, visible, default_page, order_field, modifier, modified) values
+('elerhetosegek', 'Elérhetőségek', 'Elérhetőségek', 'ALAP','', 1, 1, 0, 100, 'system', current_timestamp);

@@ -123,40 +123,59 @@
       <tr id="tr-content-title-<%=rows[row].id%>" style="display:none;">
         <td>Tartalom</td>
         <td colspan="4">&nbsp;
-          <button onclick="change('<%=rows[row].id%>', 'content');">Html mentése</button>
 
+          <button onclick="change('<%=rows[row].id%>', 'content');" id="btn-content-save-<%=rows[row].id%>"
+            <% if (0 == rows[row].enabled_editor) { print('style="display:none;"');} %>
+            >
+            Html mentése</button>
+          <button onclick="changeEditorState('<%=rows[row].id%>');" id="btn-change-editor-state-<%=rows[row].id%>">
+            <% if (1 == rows[row].enabled_editor) { print('Szerkesztő segéd kikapcsolása');} %>
+            <% if (0 == rows[row].enabled_editor) { print('Szerkesztő segéd bekapcsolása');} %>
+          </button>
+          <input type="hidden" id="hf-enabled-editor-<%=rows[row].id%>" value="<%=rows[row].enabled_editor%>"/>
         </td>
       </tr>
 
       <tr id="tr-content-<%=rows[row].id%>" style="display:none;">
         <td colspan="5">
+          <div id="div-editor-<%=rows[row].id%>"
+            <% if (0 == rows[row].enabled_editor) { print('style="display:none;"');} %>
+            >
+            <textarea
+            id="tb-content-<%=rows[row].id%>"
+            style="height:400px;width:100%">
+            <%=rows[row].content%>
+            </textarea>
+          </div>
           <textarea
-          id="tb-content-<%=rows[row].id%>"
-          style="height:400px;width:100%">
-          <%=rows[row].content%>
-          </textarea>
+          id="tb-simple-content-<%=rows[row].id%>"
+          onchange="change('<%=rows[row].id%>', 'content-no-editor');"
+          style="height:400px;width:100%;<% if (1 == rows[row].enabled_editor) { print('display:none;"');} else {print('"');} %>
+          ><%=rows[row].content%></textarea>
         </td>
       </tr>
 
-      <tr id="tr-css-<%=rows[row].id%>" style="display:none;">
+      <tr id="tr-css-js-<%=rows[row].id%>" style="display:none;">
         <td colspan="5">
-          css<br>
-          <textarea
-          id="tb-css-<%=rows[row].id%>"
-          style="height:120px;width:100%"
-          onchange="change('<%=rows[row].id%>', 'css');"><%=rows[row].css%></textarea>
-        </td>
-      </tr>
-
-
-      <tr id="tr-js-<%=rows[row].id%>" style="display:none;">
-        <td colspan="5">
-          Javascript<br>
-          <textarea
-          id="tb-js-<%=rows[row].id%>"
-          style="height:120px;width:100%"
-          onchange="change('<%=rows[row].id%>', 'js');"
-          ><%=rows[row].js%></textarea>
+          <table style="width:100%">
+            <tr >
+              <td style="padding: 15px">
+                css<br>
+                <textarea
+                id="tb-css-<%=rows[row].id%>"
+                style="height:120px;width:100%;resize: none;"
+                onchange="change('<%=rows[row].id%>', 'css');"><%=rows[row].css%></textarea>
+              </td>
+              <td style="padding: 15px">
+                Javascript<br>
+                <textarea
+                id="tb-js-<%=rows[row].id%>"
+                style="height:120px;width:100%;resize: none;"
+                onchange="change('<%=rows[row].id%>', 'js');"
+                ><%=rows[row].js%></textarea>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
 
@@ -174,6 +193,24 @@
   <% } %>
 </div>
   <script type="text/javascript">
+
+    function changeEditorState(id){
+      var enabledEditor = $('#hf-enabled-editor-' + id).val();
+      if (enabledEditor == '1'){
+        $('#btn-change-editor-state-' + id).text('Szerkesztő segéd bekapcsolása');
+        $('#hf-enabled-editor-' + id).val('0');
+        $('#div-editor-' + id).hide();
+        $('#btn-content-save-' + id).hide();
+        $('#tb-simple-content-' + id).show();
+      }
+      else {
+        $('#btn-change-editor-state-' + id).text('Szerkesztő segéd kikapcsolása');
+        $('#hf-enabled-editor-' + id).val('1');
+        $('#div-editor-' + id).show();
+        $('#btn-content-save-' + id).show();
+        $('#tb-simple-content-' + id).hide();
+      }
+    }
 
     function changeHtml(siteId){
       var fieldValue = $('#tb-name-' + siteId).val().trim();
@@ -220,6 +257,15 @@
               fieldValue = editors[i].editor.getContents();
             }
           }
+          $('#tb-simple-content-' + siteId).val(fieldValue);
+          break;
+        case 'content-no-editor':
+          fieldValue = $('#tb-simple-content-' + siteId).val().trim();
+          for (var i=0; i<editors.length; i++) {
+            if (editors[i].id == siteId){
+              editors[i].editor.setContents(fieldValue);
+            }
+          }
           break;
         case 'css':
           fieldValue = $('#tb-css-' + siteId).val();
@@ -250,8 +296,7 @@
           $('#tr-title-' + siteId).show();
           $('#tr-content-title-' + siteId).show();
           $('#tr-content-' + siteId).show();
-          $('#tr-css-' + siteId).show();
-          $('#tr-js-' + siteId).show();
+          $('#tr-css-js-' + siteId).show();
         }
         else if (siteType == 'NEWS'){
           $('#tr-content-news-' + siteId).show();
@@ -266,6 +311,7 @@
         $('#tr-content-title-' + siteId).hide();
         $('#tr-content-' + siteId).hide();
         $('#tr-content-news-' + siteId).hide();
+        $('#tr-css-js-' + siteId).hide();
       }
     }
 
