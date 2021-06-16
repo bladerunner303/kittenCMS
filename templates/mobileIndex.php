@@ -1,4 +1,4 @@
-<div id="div-menu" style="background-color:black" >
+<div id="div-menu" style="background-color:black;height: 32px" >
     <?php print $menuHtml; ?>
 </div>
 <table style="margin-left: auto; margin-right:auto">
