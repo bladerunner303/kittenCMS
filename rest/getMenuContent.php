@@ -4,11 +4,16 @@ require_once '../dal/stat.php';
 require_once '../dal/configMenu.php';
 require_once '../dal/news.php';
 require_once '../includes/jsonParser.php';
-require_once '../includes/systemUtil.php';
 require_once '../includes/logger.php';
+require_once '../includes/systemUtil.php';
+
 
 $page = !empty($_GET['page']) ? $_GET['page'] : null ;
 $isMobile = !empty($_GET['mobile']) ? $_GET['mobile'] : 0 ;
+$geoInf = new stdClass();
+$geoInf->city = !empty($_GET['city']) ? $_GET['city'] : null ;
+$geoInf->countryName = !empty($_GET['country']) ? $_GET['country'] : null ;
+$geoInf->regionName = !empty($_GET['region']) ? $_GET['region'] : null ;
 try {
   if ($page == null){
     $page = ConfigMenu::getDefaultPage();
@@ -19,13 +24,14 @@ try {
     $ip,
     $page,
     empty($_SERVER['HTTP_USER_AGENT'])? 'N/A' : $_SERVER['HTTP_USER_AGENT'],
-    SystemUtil::getGeoInfoFromIp($ip)
+    $geoInf
    );
   $menu = ConfigMenu::getMenuItems($page, 1);
   if (($menu == null) || (count($menu) == 0)){
     throw new InvalidArgumentException("Nem található a keresett oldal!");
   }
   $ret = new stdClass();
+  $ret->html = '';
   if (!empty($menu[0]->css)){
       $ret->html = '<style>' . $menu[0]->css . '</style>';
   }

@@ -12,22 +12,13 @@ class Stat{
       $pre = $db->prepare(SqlConst::STAT_ADD);
 
       $ip = md5($ip . 'd4ecd1d0-c8e0-435f-9ebd-7b6bb2f73725');
-      if (empty($geoInf->countryName)){
-        $geoInf->countryName = 'N/A';
-      }
-      if (empty($geoInf->city)){
-        $geoInf->city = 'N/A';
-      }
-      if (empty($geoInf->regionName)){
-        $geoInf->regionName = 'N/A';
-      }
-
+      
       $pre->bindParam(':ip_hash', $ip, PDO::PARAM_STR);
       $pre->bindParam(':page_id', $pageId, PDO::PARAM_STR);
       $pre->bindParam(':user_agent', $userAgent, PDO::PARAM_STR);
-      $pre->bindParam(':country', $geoInf->countryName, PDO::PARAM_STR);
-      $pre->bindParam(':city', $geoInf->city, PDO::PARAM_STR);
-      $pre->bindParam(':region', $geoInf->regionName, PDO::PARAM_STR);
+      $pre->bindParam(':country', $geoInf->countryName, empty($geoInf->countryName)?PDO::PARAM_NULL:PDO::PARAM_STR);
+      $pre->bindParam(':city', $geoInf->city, empty($geoInf->city)?PDO::PARAM_NULL:PDO::PARAM_STR);
+      $pre->bindParam(':region', $geoInf->regionName, empty($geoInf->regionName)?PDO::PARAM_NULL:PDO::PARAM_STR);
 
       $pre->execute();
     } catch (\Exception $e) {

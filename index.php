@@ -41,6 +41,20 @@ $metaKeywords = ConfigSetting::getSettingValue('meta-keywords');
 $bgColor = ConfigSetting::getSettingValue('background-color');
 $menuItems = ConfigMenu::getMenuList();
 
+$geoLocationtype = Config::$geoLocationtype;
+$geoUrl = '';  // kwelo, geoplugin-http, geoplugin-https
+switch ($geoLocationtype) {
+  case 'kwelo':
+    $geoUrl = Config::$urlKwelo;
+    break;
+  case 'geoplugin-http':
+    $geoUrl = Config::$urlGeoPluginHttp;
+    break;
+  case 'geoplugin-https':
+    $geoUrl = Config::$urlGeoPluginHttps;
+    break;
+}
+
 $menuHtml = '';
 
 if ($isMobile){
@@ -110,7 +124,8 @@ include("includes/jslibs.php");
 </head>
 <body style="background-color:<?php print $bgColor; ?>">
 <input type="hidden" id="hd-is-mobile" value="<?php print $isMobile ? 1:0 ?>"/>
-
+<input type="hidden" id="hd-ip" value="" />
+<script id="geo-plugin-script" type="text/javascript" src="http://www.geoplugin.net/javascript.gp?x=<?php print rand(); ?>"></script>
 <?php
 if ($isMobile){
   require 'templates/mobileIndex.php';
@@ -121,14 +136,65 @@ else {
 ?>
 
   <script type="text/javascript">
+    var requestIp = "<?php print SystemUtil::getRequestIp(); ?>";
     var baseUrl = "<?php print Config::$baseUrl; ?>";
+    var geoType = "<?php print $geoLocationtype; ?>";
+    var geoUrl = "<?php print $geoUrl; ?>";
+
+    var geoObj = {};
+    geoObj.city = null;
+    geoObj.country = null;
+    geoObj.region = null;
 
     $( document ).ready(function(){
       //$( document ).tooltip();
       var page = Util.getQueryVariable('page');
-      showPage(page);
+
+      if (geoType != 'none'){
+        geoUrl = geoUrl.split('{{ip}}').join(requestIp);
+        geoUrl = new URL(geoUrl);
+        geoUrl.searchParams.set('x', Date.now());
+      }
+
+      if (geoType == 'kwelo'){
+
+        $.getJSON(geoUrl,
+            function (data) {
+              try {
+                geoObj.city = data.data.geolocation.city.names.en;
+                geoObj.country = data.data.geolocation.country.names.en;
+                geoObj.region = data.data.geolocation.subdivisions[0].names.en;
+              } catch (e) {
+                console.log(e)
+              }
+
+
+            }
+        ).always(function() { showPage(page); });
+
+      }
+      else if (geoType == 'geoplugin-http'){
+        $.getJSON(geoUrl,
+          function (data) {
+
+            try {
+              geoObj.city = data.geoplugin_city;
+              geoObj.country = data.geoplugin_country;
+              geoObj.region = data.geoplugin_region;
+            } catch (e) {
+              console.log(e)
+            }
+          }
+        ).always(function() { showPage(page); });
+      }
+      else {
+        showPage(page);
+      }
+
     });
+
     function showPage(id){
+
       Util.removeUrlParams(Util.getQueryVariable('page'));
       if (!Util.isNullOrEmpty(id)){
         Util.addUrlParams('page', id);
@@ -136,6 +202,15 @@ else {
       var pageContentUrl = new URL(baseUrl + '/rest/getMenuContent.php');
       pageContentUrl.searchParams.set('page', id);
       pageContentUrl.searchParams.set('mobile', $('#hd-is-mobile').val());
+      if (!Util.isNullOrEmpty(geoObj.city)){
+          pageContentUrl.searchParams.set('city', geoObj.city);
+      }
+      if (!Util.isNullOrEmpty(geoObj.region)){
+          pageContentUrl.searchParams.set('region', geoObj.region);
+      }
+      if (!Util.isNullOrEmpty(geoObj.country)){
+          pageContentUrl.searchParams.set('country', geoObj.country);
+      }
       pageContentUrl.searchParams.set('x', Date.now());
 
       $.ajax({

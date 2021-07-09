@@ -63,7 +63,7 @@ class SqlConst{
   (id, name, menu_type, visible, order_field, default_page, modifier, modified) VALUES
   (:id, :field_value, 'ALAP', 0,
   (select COALESCE(max(order_field), 0)+10 from config_menu cm2),
-  0, 
+  0,
   lower(:modifier), current_timestamp)";
 
   const MENU_REMOVE = "UPDATE config_menu
@@ -151,6 +151,7 @@ class SqlConst{
   "select city item_name, count(*) item_count
   from stat
   where stamp between :date_from and :date_to
+  and city is not null
   group by city
   order by count(*) desc
   ";
@@ -159,6 +160,7 @@ class SqlConst{
   "select region item_name, count(*) item_count
   from stat
   where stamp between :date_from and :date_to
+  and region is not null
   group by region
   order by count(*) desc
   ";
@@ -167,6 +169,7 @@ class SqlConst{
   "select country item_name, count(*) item_count
   from stat
   where stamp between :date_from and :date_to
+  and country is not null
   group by country
   order by count(*) desc
   ";
