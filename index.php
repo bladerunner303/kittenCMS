@@ -148,7 +148,11 @@ else {
 
     $( document ).ready(function(){
       //$( document ).tooltip();
+      var defaultPage = '<?php print ConfigMenu::getDefaultPage(); ?>';
       var page = Util.getQueryVariable('page');
+      if (Util.isNullOrEmpty(page)){
+        page = defaultPage;
+      }
 
       if (geoType != 'none'){
         geoUrl = geoUrl.split('{{ip}}').join(requestIp);

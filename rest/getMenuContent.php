@@ -15,9 +15,6 @@ $geoInf->city = !empty($_GET['city']) ? $_GET['city'] : null ;
 $geoInf->countryName = !empty($_GET['country']) ? $_GET['country'] : null ;
 $geoInf->regionName = !empty($_GET['region']) ? $_GET['region'] : null ;
 try {
-  if ($page == null){
-    $page = ConfigMenu::getDefaultPage();
-  }
 
   $ip = SystemUtil::getRequestIp();
   Stat::addStat(

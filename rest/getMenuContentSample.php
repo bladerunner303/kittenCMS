@@ -10,9 +10,6 @@ require_once '../includes/logger.php';
 $page = !empty($_GET['page']) ? $_GET['page'] : null ;
 $isMobile = !empty($_GET['mobile']) ? $_GET['mobile'] : 0 ;
 try {
-  if ($page == null){
-    $page = ConfigMenu::getDefaultPage();
-  }
 
   $menu = ConfigMenu::getMenuItems($page, 0);
   if (($menu == null) || (count($menu) == 0)){
