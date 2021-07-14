@@ -330,8 +330,6 @@
                  }
                  else if ((params.field == 'default_page') && (params.fieldValue == '1')) {
                    $('[id^=cb-default-page]').each(function(){
-                      console.log(params.siteId);
-                      console.log($(this).prop('id'));
                       if (('cb-default-page-' + params.siteId) != $(this).prop("id")) {
                         document.getElementById($(this).prop("id")).checked = 0;
                       }
