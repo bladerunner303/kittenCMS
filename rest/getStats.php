@@ -11,13 +11,13 @@ try {
     JsonParser::sendSessionExpired();
     return;
   }
-  $ret;
+  $ret ="";
   $statType = !empty($_GET['statType']) ? $_GET['statType'] : null ;
   $dateFrom = !empty($_GET['dateFrom']) ? $_GET['dateFrom'] : null ;
   $dateTo = !empty($_GET['dateTo']) ? $_GET['dateTo'] : null ;
 
   $ret = Stat::getStat($statType, $dateFrom, $dateTo);
-  
+
   JsonParser::sendJson($ret);
 } catch (Exception $e) {
   Logger::error($e->getMessage() . $e->getTraceAsString());

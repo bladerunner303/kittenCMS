@@ -7,6 +7,11 @@ $jquery = '';
 $jqueryUi = '';
 $jqueryUiCss = '';
 $handlerbars= '';
+$jqueryDatePickerLang = '';
+$underscore = '';
+$chartjs = '';
+$editorjs = '';
+$editorCss = '';
 
 if ($jsType == "admin"){
 

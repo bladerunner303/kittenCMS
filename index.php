@@ -18,8 +18,8 @@ $isMobile = false;
 $enabledMobileView = ConfigSetting::getSettingValue('enabled-mobile-view');
 if (((int)$enabledMobileView == 1) && (SystemUtil::isMobile())){
   //csak mobile ág
-//  $headerHtml = ConfigSetting::getSettingValue('header-mobile-html');
-//  $footerHtml = ConfigSetting::getSettingValue('footer-mobile-html');
+  $headerHtml = ConfigSetting::getSettingValue('header-mobile-html');
+  $footerHtml = ConfigSetting::getSettingValue('footer-mobile-html');
   $contentLength = ConfigSetting::getSettingValue('content-mobile-length');
   $isMobile = true;
 }

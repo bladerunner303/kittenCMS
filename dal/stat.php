@@ -1,5 +1,7 @@
 <?php
 
+set_include_path(dirname(__FILE__)."/../");
+require_once 'includes/logger.php';
 require_once 'sqlConst.php';
 require_once 'data.php';
 
@@ -12,7 +14,7 @@ class Stat{
       $pre = $db->prepare(SqlConst::STAT_ADD);
 
       $ip = md5($ip . 'd4ecd1d0-c8e0-435f-9ebd-7b6bb2f73725');
-      
+
       $pre->bindParam(':ip_hash', $ip, PDO::PARAM_STR);
       $pre->bindParam(':page_id', $pageId, PDO::PARAM_STR);
       $pre->bindParam(':user_agent', $userAgent, PDO::PARAM_STR);
@@ -22,7 +24,7 @@ class Stat{
 
       $pre->execute();
     } catch (\Exception $e) {
-      error_log('Hiba a stat mentésekor', $e->excepiton);
+      Logger::error('Hiba a stat mentésekor:' . $e->getMessage() . $e->getTraceAsString());
     }
 
 

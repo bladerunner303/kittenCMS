@@ -39,7 +39,7 @@ class User{
     }
 
 		$db = Data::getInstance();
-		$pre = $db->prepare(Sqlconst::USER_BAD_LOGIN_COUNT);
+		$pre = $db->prepare(SqlConst::USER_BAD_LOGIN_COUNT);
     $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
     $pre->bindParam(':min', Config::$forrbidenTime, PDO::PARAM_INT);
 
@@ -93,7 +93,7 @@ class User{
 
 private static function setLastLogin($userName){
   $db = Data::getInstance();
-  $pre = $db->prepare(Sqlconst::USER_UPDATE_LAST_LOGIN);
+  $pre = $db->prepare(SqlConst::USER_UPDATE_LAST_LOGIN);
   $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
 
   $pre->execute();
@@ -102,7 +102,7 @@ private static function setLastLogin($userName){
 
 private static function clearBadLogins($userName){
   $db = Data::getInstance();
-  $pre = $db->prepare(Sqlconst::USER_CLEAR_BAD_LOGINS);
+  $pre = $db->prepare(SqlConst::USER_CLEAR_BAD_LOGINS);
   $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
 
   $pre->execute();
@@ -112,17 +112,10 @@ private static function clearBadLogins($userName){
 
 private static function addBadLogin($userName){
   $db = Data::getInstance();
-  $pre = $db->prepare(Sqlconst::USER_ADD_BAD_LOGIN);
+  $pre = $db->prepare(SqlConst::USER_ADD_BAD_LOGIN);
   $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
 
   $pre->execute();
-
-}
-
-public static function logout($userName){
-
-  $user = self::get($userName);
-  self::set($user, 'LOGOUT');
 
 }
 
@@ -155,7 +148,7 @@ public static function changePassword($oldPassword, $newPassword, $userName, $is
   }
 
   $db = Data::getInstance();
-  $pre = $db->prepare(Sqlconst::USER_SET_PWD);
+  $pre = $db->prepare(SqlConst::USER_SET_PWD);
   $newPassword = self::encodePassword($newPassword);
   $pre->bindParam(':password', $newPassword, PDO::PARAM_STR);
   $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
@@ -194,7 +187,7 @@ public static function save($userName, $userRole, $status, $modifier){
   else {
     if (($userRole == 'EDITOR')
     || (($userRole == 'ADMIN') && ($status == 'INAKTIV'))){
-      $pre = $db->prepare(Sqlconst::USER_ADMIN_COUNT);
+      $pre = $db->prepare(SqlConst::USER_ADMIN_COUNT);
       $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
   		$pre->execute();
   		$adminUserCnt = (int)$pre->fetch(PDO::FETCH_OBJ)->cnt;
@@ -204,7 +197,7 @@ public static function save($userName, $userRole, $status, $modifier){
       }
     }
 
-    $pre = $db->prepare(Sqlconst::USER_UPDATE);
+    $pre = $db->prepare(SqlConst::USER_UPDATE);
     $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
     $pre->bindParam(':role', $userRole, PDO::PARAM_STR);
     $pre->bindParam(':status', $status, PDO::PARAM_STR);

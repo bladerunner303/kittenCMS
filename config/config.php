@@ -27,6 +27,7 @@ class Config{
 
   public static $urlKwelo = "https://api.kwelo.com/v1/network/ip-address/location/{{ip}}?format=json";
   public static $urlGeoPluginHttp = "http://geoplugin.net/json.gp";
+  public static $urlGeoPluginHttps = "";
 
 }
 ?>

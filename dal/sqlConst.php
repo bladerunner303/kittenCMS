@@ -37,17 +37,6 @@ class SqlConst{
                             AND deleted is null
                             ORDER BY order_field";
 
-  const MENU_UPDATE = "UPDATE config_menu SET
-                        name = :name,
-                        tooltip = :tooltip,
-                        content = :content,
-                        visible = :visible,
-                        order_field = :order_field,
-                        modifer = lower(:user_name),
-                        modified = current_timestamp
-                        where id = :id
-                        and deleted is null";
-
   const MENU_UPDATE_TEMPLATE = "UPDATE config_menu SET
                               <%%field_name%%>=:field_value,
                               modifier = lower(:modifier),

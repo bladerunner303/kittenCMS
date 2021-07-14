@@ -113,19 +113,6 @@ class ConfigMenu{
     return $cleanMenuName;
   }
 
-  public static function updateMenu($menuObj){
-    $db = Data::getInstance();
-    $pre = $db->prepare(SqlConst::MENU_UPDATE);
-    $pre->bindParam(':name', $settingKey, PDO::PARAM_STR);
-    $pre->bindParam(':tooltip', $settingValue, PDO::PARAM_STR);
-    $pre->bindParam(':content', $userName, PDO::PARAM_STR);
-    $pre->bindParam(':visible', $userName, PDO::PARAM_INT);
-    $pre->bindParam(':order_field', $userName, PDO::PARAM_INT);
-    $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
-    $pre->bindParam(':id', $userName, PDO::PARAM_STR);
-    $pre->execute();
-  }
-
   public static function removeMenu($siteId, $modifier){
     $db = Data::getInstance();
     $pre = $db->prepare(SqlConst::MENU_REMOVE);

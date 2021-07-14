@@ -89,7 +89,7 @@ class Session{
     $db = Data::getInstance();
     $pre = $db->prepare(SqlConst::SESSION_KILL_BY_NAME);
     $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);
-    $pre->execute($params);
+    $pre->execute();
   }
 
   public static function clearOldSession(){

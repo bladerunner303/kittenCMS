@@ -1,5 +1,7 @@
 <?php
 
+//require_once '../includes/logger.php';
+
 class SystemUtil {
 
 	public static function isMobile() {
@@ -7,7 +9,7 @@ class SystemUtil {
 	}
 
 	public static function getGuid(){
-		mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
+		mt_srand((double)microtime()*10000);
 		$charid = strtoupper(md5(uniqid(rand(), true)));
 		$hyphen = chr(45);// "-"
 		//$uuid = chr(123)// "{"
@@ -29,7 +31,9 @@ class SystemUtil {
 	}
 
 	public static function getGeoInfoFromIp($ip){
-		$xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
+
+
+		$xml = simplexml_load_file($geoUrl);
 		$ret = new stdClass();
 		foreach ($xml as $key => $value)
 		{
