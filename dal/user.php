@@ -100,7 +100,7 @@ private static function setLastLogin($userName){
 
 }
 
-private static function clearBadLogins($userName){
+public static function clearBadLogins($userName){
   $db = Data::getInstance();
   $pre = $db->prepare(SqlConst::USER_CLEAR_BAD_LOGINS);
   $pre->bindParam(':user_name', $userName, PDO::PARAM_STR);

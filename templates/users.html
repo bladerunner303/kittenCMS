@@ -54,8 +54,8 @@
 
       <td><%-rows[row].last_login%></td>
       <td><%-rows[row].last_pwd_change%></td>
-      <td><%-rows[row].active_session%></td>
-      <td><%-rows[row].bad_logins%></td>
+      <td style="text-align: center;"><%-rows[row].active_session%></td>
+      <td style="text-align: center;"><%-rows[row].bad_logins%></td>
       <td style="padding:5px;">
         <%-rows[row].modified%>(<%-rows[row].modifier%>)&nbsp;
       </td>
@@ -65,11 +65,15 @@
           title="Új jelszó megadása a felhasználónak">Új jelszó</button>
         <button onclick="killUserSessions('<%=rows[row].user_name%>');"
           title="Felhasználó aktuális session-jeinek megszüntetése">Kilökés</button>
+        <button onclick="clearBadLogins('<%=rows[row].user_name%>');"
+          title="Felhasználó korábbi téves bejelentkezéseinek eldobása"
+          <% if (rows[row].bad_logins == '0') { print(' style="display:none" ');} %>
+          >Hibás login törlés</button>
       </td>
     </tr>
     <% } %>
   </table>
-
+<br>
   <button onclick="openUserDialog();" id="bt-add-new-user"
   <% if (currentUserRole != 'ADMIN') { print('style="display:none;"');} %>
   >Új felhasználó</button>
@@ -318,6 +322,24 @@
           success: function(data){
                 refreshUsers();
                 Util.showNotificationBar('A ' + data + ' felhasználó minden session-jét megszüntettük.');
+          },
+          error: function(response) {
+              Util.handleErrorResponse(response);
+          }
+         });
+    }
+
+    function clearBadLogins(userName){
+      var data = JSON.stringify({
+        'userName':userName
+      });
+      $.ajax({
+          url: "../rest/clearBadLogins.php",
+          type: 'POST',
+          data: data,
+          success: function(data){
+                refreshUsers();
+                Util.showNotificationBar('A ' + data + ' felhasználó hibás bejelentkezéseit töröltük.');
           },
           error: function(response) {
               Util.handleErrorResponse(response);
