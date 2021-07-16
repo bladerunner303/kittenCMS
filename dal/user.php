@@ -176,7 +176,7 @@ public static function save($userName, $userRole, $status, $modifier){
   //  $cleanUserName = self::clearUserName($userName);
     $cleanUserName = SystemUtil::clearString($userName);
 
-    $pre = $db->prepare(Sqlconst::USER_ADD);
+    $pre = $db->prepare(SqlConst::USER_ADD);
     $pre->bindParam(':user_name', $cleanUserName, PDO::PARAM_STR);
     $pre->bindParam(':user_pwd', self::encodePassword($userName), PDO::PARAM_STR);
     $pre->bindParam(':role', $userRole, PDO::PARAM_STR);

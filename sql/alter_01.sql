@@ -48,7 +48,7 @@ id		                varchar(50)   not null,
 name		              varchar(50)   null,
 menu_type             varchar(50)   not null, -- ALAP, NEWS
 tooltip		            varchar(255)  null,
-content		            varchar(4000) null,
+content		            varchar(32000) null,
 css                   varchar(4000) null,
 js                    varchar(4000) null,
 enabled_editor        integer       not null,
@@ -74,6 +74,8 @@ create table news(
   created               timestamp     null,
   modifier              varchar(50)   not null,
   modified              timestamp     null,
+  deleted_by            varchar(50)   null,
+  deleted               timestamp     null,
 constraint pk_news primary key (id)
 )
 engine=innodb;

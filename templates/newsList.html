@@ -54,6 +54,12 @@
         <button id="btn-news-content-mod" onclick="showNewsEditor('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , '<%-rows[row].content%>');">
           Tartalom
         </button>
+        <button id="btn-news-content-del"
+        onclick="Util.confirm('Megerősítés','A hír végleges törlésre kerül! Biztos folytatjuk?', deleteNews, {newsId:'<%-rows[row].id%>', siteId: '<%-rows[row].menu_id%>'} );"
+        title="Hír végleges törlése"
+        >
+        Törlés
+        </button>
       </td>
     </tr>
     <% } %>
@@ -61,6 +67,21 @@
   </table>
 
   <script type="text/javascript">
+
+    function deleteNews(deleteObj){
+
+      $.ajax({
+          url: "../rest/removeNews.php",
+          type: 'POST',
+          data: JSON.stringify(deleteObj),
+          success: function(data){
+                refreshNews(deleteObj.siteId);
+          },
+          error: function(response) {
+             Util.handleErrorResponse(response);
+          }
+         });
+    }
 
     function addNews(siteId){
       showNewsEditor(siteId, null);

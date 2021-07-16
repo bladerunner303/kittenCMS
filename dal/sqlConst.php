@@ -59,14 +59,21 @@ class SqlConst{
                        SET
                        deleted  = current_timestamp,
                        deleted_by = :user_name
-                       WHERE id = :id";
+                       WHERE id = :id ";
 
   const NEWS_SELECT = "SELECT * FROM news
                         WHERE menu_id = :menu_id
                         AND visible in (1, :visible)
+                        and deleted is null
                         ORDER BY highlight desc, created DESC";
 
-  const NEWS_SELECT_BY_ID = "SELECT * FROM news WHERE id = :id";
+  const NEWS_SELECT_BY_ID = "SELECT * FROM news WHERE id = :id and deleted is null";
+
+  const NEWS_REMOVE = "UPDATE news
+                       SET
+                       deleted  = current_timestamp,
+                       deleted_by = :user_name
+                       WHERE id = :id";
 
   const NEWS_ADD = "INSERT INTO news (id, menu_id, title, content, visible, highlight, creator, created, modified, modifier)
                     VALUES (:id, :menu_id, :title, :content, :visible, :highlight, :user, current_timestamp, current_timestamp, :user)";
@@ -76,25 +83,25 @@ class SqlConst{
                                 title = :title,
                                 modifier = :user,
                                 modified = current_timestamp
-                              WHERE id = :id";
+                              WHERE id = :id and deleted is null";
   const NEWS_MODIFY_CONTENT = "UPDATE news
                                 SET
                                 content = :content,
                                 modifier = :user,
                                 modified = current_timestamp
-                                WHERE id = :id";
+                                WHERE id = :id and deleted is null";
   const NEWS_MODIFY_VISIBLE = "UPDATE news
                                 SET
                                 visible = :visible,
                                 modifier = :user,
                                 modified = current_timestamp
-                                WHERE id = :id";
+                                WHERE id = :id and deleted is null";
   const NEWS_MODIFY_HIGHLIGHT = "UPDATE news
                     SET
                     highlight = :highlight,
                     modifier = :user,
                     modified = current_timestamp
-                    WHERE id = :id";
+                    WHERE id = :id and deleted is null";
 
   const STAT_ADD = "INSERT INTO stat (stamp, ip_hash, page_id, user_agent, country, city, region)
                     values (current_timestamp,:ip_hash, :page_id, :user_agent, :country, :city, :region )";

@@ -38,7 +38,7 @@ class News{
       $newsTemplate = ConfigSetting::getSettingValue("news-mobile-template");
     }
     if ($newsTemplate == ""){
-      $newsTemplate = ConfigSetting::getSettingValue("news-template");  
+      $newsTemplate = ConfigSetting::getSettingValue("news-template");
     }
 
     $html = "";
@@ -104,6 +104,14 @@ class News{
       $pre->execute();
     }
 
+  }
+
+  public static function remove($menuId, $user){
+    $db = Data::getInstance();
+    $pre = $db->prepare(SqlConst::NEWS_REMOVE);
+    $pre->bindParam(':id', $menuId, PDO::PARAM_STR);
+    $pre->bindParam(':user_name', $user, PDO::PARAM_STR);
+    $pre->execute();
   }
 }
 ?>
