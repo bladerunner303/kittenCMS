@@ -67,9 +67,6 @@ if ($isMobile){
   }
   $menuHtml .= "</div></div>";
   $menuHtml .= '<script type="text/javascript">
-  function showAlert() {
-    alert("valami");
-  }
 
   function showMenuItems() {
     document.getElementById("dropdown-menu").classList.toggle("show");
@@ -125,7 +122,7 @@ include("includes/jslibs.php");
 <body style="background-color:<?php print $bgColor; ?>">
 <input type="hidden" id="hd-is-mobile" value="<?php print $isMobile ? 1:0 ?>"/>
 <input type="hidden" id="hd-ip" value="" />
-<script id="geo-plugin-script" type="text/javascript" src="http://www.geoplugin.net/javascript.gp?x=<?php print rand(); ?>"></script>
+
 <?php
 if ($isMobile){
   require 'templates/mobileIndex.php';
