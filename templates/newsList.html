@@ -54,6 +54,11 @@
         <button id="btn-news-content-mod" onclick="showNewsEditor('<%-rows[row].menu_id%>',  '<%-rows[row].id%>' , '<%-rows[row].content%>');">
           Tartalom
         </button>
+        <button id="btn-news-content-copy"
+          onclick="copyNews('<%-rows[row].id%>');"
+          title="Új hírt hoz létre ennek a tartalmával.">
+          Másol
+        </button>
         <button id="btn-news-content-del"
         onclick="Util.confirm('Megerősítés','A hír végleges törlésre kerül! Biztos folytatjuk?', deleteNews, {newsId:'<%-rows[row].id%>', siteId: '<%-rows[row].menu_id%>'} );"
         title="Hír végleges törlése"
@@ -85,6 +90,24 @@
 
     function addNews(siteId){
       showNewsEditor(siteId, null);
+    }
+
+    function copyNews(newsId){
+      var data = {};
+      data.id = newsId;
+
+      $.ajax({
+          url: "../rest/copyNews.php",
+          type: 'POST',
+          data: JSON.stringify(data),
+          success: function(data){
+              showNewsEditor(data.siteId, data.newsId, data.content);
+          },
+          error: function(response) {
+             Util.handleErrorResponse(response);
+          }
+         });
+
     }
 
     function showNewsEditor(siteId, newsId, content){

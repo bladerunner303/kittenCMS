@@ -67,7 +67,8 @@ class News{
     $pre->bindParam(':highlight', $newsObj->highlight, PDO::PARAM_INT);
     $pre->bindParam(':user', $user, PDO::PARAM_STR);
     $pre->execute();
-    }
+    return $id;
+  }
 
   public static function modify($newsObj, $user){
     $db = Data::getInstance();
@@ -112,6 +113,29 @@ class News{
     $pre->bindParam(':id', $menuId, PDO::PARAM_STR);
     $pre->bindParam(':user_name', $user, PDO::PARAM_STR);
     $pre->execute();
+  }
+
+  public static function copy($originalNewsId, $user){
+
+    $originalNews = self::getById($originalNewsId);
+    if ($originalNews == null){
+      throw new InvalidArgumentException('Nem található az eredeti hír!');
+    }
+    $newsObj = new stdClass();
+    $newsObj->siteId = $originalNews->menu_id;
+    $newsObj->title = $originalNews->title;
+    $newsObj->content = $originalNews->content;
+    $newsObj->visible = 0;
+    $newsObj->highlight = $originalNews->highlight;
+    $newsId = self::add($newsObj, $user);
+
+    $ret = new stdClass();
+    $ret->newsId = $newsId;
+    $ret->siteId = $originalNews->menu_id;
+    $ret->content = $originalNews->content;
+
+    return $ret;
+
   }
 }
 ?>
