@@ -45,6 +45,11 @@
           onclick="showLink('<%=rows[row].name%>');">
             <img src="images/document.png" style="width: 24px;height: 32px; cursor:pointer"  />
           </a>
+          <a title="Fájl linkének másolása vágólapra"
+          style="cursor:pointer;display:inline;padding:1px;"
+          onclick="Util.copyStringToClipboard(getFileFullUrl('<%=rows[row].name%>'));">
+            <img src="images/copy_document.png" style="width: 24px;height: 32px; cursor:pointer"  />
+          </a>
         </td>
       </tr>
       <% } %>
@@ -124,10 +129,12 @@
 
     function showLink(fileName){
       var messageHtml = '<a href="mylink" target="_blank">mylink</a>';
-      messageHtml = messageHtml.split('mylink').join(
-        window.location.href.split('admin/content.php?menu=files').join('uploads/'+ fileName)
-      );
+      messageHtml = messageHtml.split('mylink').join(getFileFullUrl(fileName));
       Util.showSimpleDialog("Fájl linkje", messageHtml);
+    }
+
+    function getFileFullUrl(fileName){
+      return window.location.href.split('admin/content.php?menu=files').join('uploads/'+ fileName);
     }
 
   </script>

@@ -1,4 +1,5 @@
 <?php
+// 2021.08.21
 if (!isset($jsType)){
 	$jsType = "admin";
 }
@@ -119,6 +120,19 @@ else {
 					else {
 						return true;
 					}
+				},
+			 copyStringToClipboard : function (str) {
+
+   	 			var el = document.createElement('textarea');
+   				el.value = str;
+   				// Set non-editable to avoid focus and move outside of view
+   				el.setAttribute('readonly', '');
+   				el.style = {position: 'absolute', left: '-9999px'};
+   				document.body.appendChild(el);
+
+   				el.select();
+      		document.execCommand('copy');
+   				document.body.removeChild(el);
 				},
 				handleErrorResponse: function(response){
 					if (response.status == 401){
