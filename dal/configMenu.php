@@ -117,7 +117,7 @@ class ConfigMenu{
     $db = Data::getInstance();
     $pre = $db->prepare(SqlConst::MENU_REMOVE);
     $pre->bindParam(':id', $siteId, PDO::PARAM_STR);
-    $pre->bindParam(':deleted_by', $modifier, PDO::PARAM_STR);
+    $pre->bindParam(':user_name', $modifier, PDO::PARAM_STR);
     $pre->execute();
   }
 }
