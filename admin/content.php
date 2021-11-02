@@ -66,6 +66,15 @@ $maxFileSizeByte = Config::$uploadFileByteLimit;
 body{
   margin: 0px;
 }
+.div-footer {
+    min-height: 2%;
+    color: white;
+    font-size: small;
+    background: black;
+    position:fixed;
+    bottom:0;
+    width:100%;
+}
 </style>
 <?php include("includes/jslibs.php"); ?>
 </head>
@@ -85,8 +94,11 @@ body{
     <li><a id="menu-pwd-change" onclick="showPasswordChange();">Jelszó váltás</a></li>
     <li style="float:right"><a onclick="logout();">Kijelentkezés</a></li>
   </ul>
-  <div id="main-content" style="margin-top:10px;"/>
-
+  <div id="main-content" style="margin-top:10px;"></div>
+  <div class="div-footer">
+    <div style="width: 50%;display: inline-block;padding-left: 3px">Licenc: GPLv3</div>
+    <div style="width: 49%;display: inline-block;text-align: right;">Verzió: 1.0.1</div>
+  </div>
 <script type="text/javascript">
   var baseUrl = "<?php print Config::$baseUrl; ?>";
   $( document ).ready(function(){
