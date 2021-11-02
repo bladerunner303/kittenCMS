@@ -7,7 +7,6 @@ require_once 'configSetting.php';
 class News{
 
   public static function get($menuId, $visible, $first, $last){
-    $rowCount = $last - $first;
     $db = Data::getInstance();
     $pre = $db->prepare(SqlConst::NEWS_SELECT);
     $pre->bindParam(':menu_id', $menuId, PDO::PARAM_STR);
@@ -17,7 +16,7 @@ class News{
     $ret = array();
     foreach ($result as $key => $row) {
       //because mysql limit has a bug
-      if (($key >= $first) && ($key <= $last)){
+      if (($key >= (int)$first) && ($key <= (int)$last)){
         array_push($ret, $row);
       }
     }
@@ -44,12 +43,10 @@ class News{
     $html = "";
     $news = News::get($menuId, $visible, $first, $last);
     foreach ($news as $key => $item) {
-      if (( $key >= $first) && ($key <= $last)){
         $newsHtml = $newsTemplate;
         $newsHtml = str_replace('<%%title%%>', $item->title, $newsHtml);
         $newsHtml = str_replace('<%%content%%>', $item->content, $newsHtml);
         $html = $html . $newsHtml;
-      }
     }
     return $html;
   }

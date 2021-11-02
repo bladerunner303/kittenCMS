@@ -1,4 +1,3 @@
-<div id="next-news-10"></div>
 <div style="text-align:center; width: 100%">
 <button id="bt-more-news" onclick="nextNews();">Továbbiak</button>
 <input type="hidden" id="hd-news-count" value="10"></input>
@@ -21,8 +20,7 @@
 
           if (data){
             var newNewsCount = newsCount + 10;
-            data += '<div id="news-count-' + newNewsCount + '></div>';
-            $("#next-news-" + newsCount).html(data);
+            $('#news-content').append(data);
             $("#hd-news-count").val(newNewsCount);
           }
           else {

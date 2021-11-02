@@ -25,7 +25,9 @@ try {
   $ret->html .= '<div>' . $menu[0]->content . '</div>';
   $ret->modified = $menu[0]->modified;
   if ($menu[0]->menu_type == 'NEWS'){
-    $ret->html = News::getHtml($menu[0]->id, 0, 0, 9, $isMobile );
+    $ret->html = '<div id="news-content">';
+    $ret->html .= News::getHtml($menu[0]->id, 1, 0, 9, $isMobile );
+    $ret->html .='</div>';
     $ret->html .= file_get_contents("../templates/moreNews.html");
   }
   JsonParser::sendJson($ret);
