@@ -3,7 +3,9 @@
 require_once 'sqlConst.php';
 require_once 'data.php';
 require_once 'user.php';
+require_once '../config/config.php';
 require_once '../includes/systemUtil.php';
+require_once '../includes/logger.php';
 
 class Session{
 
@@ -48,14 +50,29 @@ class Session{
 
   public static function isValid($sessionId){
     try {
+      $sessionLength = 30;
+      try {
+        $sessionLength = (int)Config::$sessionLength;
+      } catch (\Exception $e) {
+        Logger::warning("Sikertelen Session Length paraméter felolvasás");
+        $sessionLength = 30;
+      }
+      if ($sessionLength <15){
+        Logger::warning("Túl alacsony session length paraméter felolvasás");
+        $sessionLength = 15;
+      }
+      if ($sessionLength>1440){
+        Logger::warning("Túl magas session length paraméter felolvasás");
+        $sessionLength = 1440;
+      }
+
       $db = Data::getInstance();
       $pre = $db->prepare(SqlConst::SESSION_VALID_COUNT);
-      $params = array (
-        ':id' => $sessionId,
-        ':ip' => SystemUtil::getRequestIp(),
-        ':browser_hash' => SystemUtil::getRequestBrowserHash()
-      );
-      $pre->execute($params);
+      $pre->bindParam(':id', $sessionId, PDO::PARAM_STR);
+      $pre->bindParam(':ip', SystemUtil::getRequestIp(), PDO::PARAM_STR);
+      $pre->bindParam(':browser_hash', SystemUtil::getRequestBrowserHash(), PDO::PARAM_STR);
+      $pre->bindParam(':session_length', $sessionLength, PDO::PARAM_INT);
+      $pre->execute();
       $sessionCount = (int)$pre->fetch(PDO::FETCH_OBJ)->cnt;
       if ($sessionCount == 1){
         $pre = $db->prepare(SqlConst::SESSION_UPDATE_LAST_ACTIVITY);

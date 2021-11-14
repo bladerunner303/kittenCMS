@@ -223,7 +223,7 @@ class SqlConst{
   AND ip = :ip
   AND browser_hash = :browser_hash
   AND logout_time is null
-  AND last_activity > addtime(CURRENT_TIMESTAMP, SEC_TO_TIME(-1*30*60))
+  AND last_activity > addtime(CURRENT_TIMESTAMP, SEC_TO_TIME(-1*:session_length*60))
   AND login_time > addtime(CURRENT_TIMESTAMP, SEC_TO_TIME(-1*24*60*60))";
 
   const SESSION_KILL =
